@@ -1,15 +1,22 @@
+group = "it.pagopa.qi"
+
+version = "0.0.1-SNAPSHOT"
+
+description = "pagopa-qi-fdr-kpi-service"
+
 plugins {
   kotlin("jvm") version "1.9.25"
   kotlin("plugin.spring") version "1.9.25"
   id("org.springframework.boot") version "3.3.6"
   id("io.spring.dependency-management") version "1.1.6"
   id("com.diffplug.spotless") version "6.18.0"
+  id("org.sonarqube") version "4.0.0.2929"
+  id("com.dipien.semantic-version") version "2.0.0" apply false
   jacoco
+  application // configures the JAR manifest, handles classpath dependencies etc.
 }
 
-group = "it.pagopa.qi"
-
-version = "0.0.1-SNAPSHOT"
+repositories { mavenCentral() }
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
 
@@ -22,7 +29,16 @@ configurations {
   compileOnly { extendsFrom(configurations.annotationProcessor.get()) }
 }
 
-repositories { mavenCentral() }
+springBoot {
+  mainClass.set("it.pagopa.qi.fdrkpiservice.PagopaQiFdrKpiServiceApplicationKt")
+  buildInfo {
+    properties {
+      additional.set(mapOf("description" to (project.description ?: "Default description")))
+    }
+  }
+}
+
+dependencyLocking { lockAllConfigurations() }
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -32,7 +48,6 @@ dependencies {
   implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-  implementation("com.diffplug.spotless:spotless-plugin-gradle:6.18.0")
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -78,7 +93,7 @@ tasks.jacocoTestReport {
     files(
       classDirectories.files.map {
         fileTree(it).matching {
-          exclude("it/pagopa/ecommerce/helpdesk/PagopaEcommerceHelpdeskServiceApplicationKt.class")
+          exclude("it/pagopa/qi/fdrkpiservice/PagopaQiFdrKpiServiceApplicationKt.class")
         }
       }
     )
