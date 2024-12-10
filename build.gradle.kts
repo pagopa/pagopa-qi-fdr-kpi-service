@@ -20,6 +20,8 @@ repositories { mavenCentral() }
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
 
+configurations { compileOnly { extendsFrom(configurations.annotationProcessor.get()) } }
+
 configurations {
   implementation.configure {
     exclude(module = "spring-boot-starter-web")
@@ -29,6 +31,8 @@ configurations {
   compileOnly { extendsFrom(configurations.annotationProcessor.get()) }
 }
 
+kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
+
 springBoot {
   mainClass.set("it.pagopa.qi.fdrkpiservice.PagopaQiFdrKpiServiceApplicationKt")
   buildInfo {
@@ -36,6 +40,15 @@ springBoot {
       additional.set(mapOf("description" to (project.description ?: "Default description")))
     }
   }
+}
+
+tasks.named<Jar>("jar") { enabled = false }
+
+tasks.create("applySemanticVersionPlugin") {
+  group = "semantic-versioning"
+  description = "Semantic versioning plugin"
+  dependsOn("prepareKotlinBuildScriptModel")
+  apply(plugin = "com.dipien.semantic-version")
 }
 
 dependencyLocking { lockAllConfigurations() }
@@ -101,3 +114,9 @@ tasks.jacocoTestReport {
 
   reports { xml.required.set(true) }
 }
+
+/**
+ * Task used to expand application properties with build specific properties such as artifact name
+ * and version
+ */
+tasks.processResources { filesMatching("application.properties") { expand(project.properties) } }
