@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 group = "it.pagopa.qi"
 
 version = "0.0.1-SNAPSHOT"
@@ -12,6 +14,7 @@ plugins {
   id("com.diffplug.spotless") version "6.18.0"
   id("org.sonarqube") version "4.0.0.2929"
   id("com.dipien.semantic-version") version "2.0.0" apply false
+  id("org.openapi.generator") version "6.6.0"
   jacoco
   application // configures the JAR manifest, handles classpath dependencies etc.
 }
@@ -48,6 +51,10 @@ dependencies {
   implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+  implementation("org.openapitools:jackson-databind-nullable")
+  implementation("io.swagger.core.v3:swagger-annotations")
+  implementation("jakarta.validation:jakarta.validation-api")
+  implementation("jakarta.annotation:jakarta.annotation-api")
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -78,7 +85,57 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
   }
 }
 
+sourceSets {
+  main {
+    java { srcDirs(layout.buildDirectory.dir("generated/src/main/java")) }
+    kotlin { srcDirs("src/main/kotlin", layout.buildDirectory.dir("generated/src/main/kotlin")) }
+    resources { srcDirs("src/resources") }
+  }
+}
+
+tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("fdrkpi-v1") {
+  description =
+    "Generates API interfaces and DTOs from OpenAPI specification for the FDR KPI service"
+  group = "openapi tools"
+  generatorName.set("spring")
+  inputSpec.set("$rootDir/api-spec/v1/openapi.yaml")
+  outputDir.set(
+    layout.buildDirectory.dir("generated").get().asFile.absolutePath
+  ) // buildDir is deprecated
+  apiPackage.set("it.pagopa.generated.fdrkpi.api")
+  modelPackage.set("it.pagopa.generated.fdrkpi.model")
+  generateApiTests.set(false)
+  generateApiDocumentation.set(false)
+  generateApiTests.set(false)
+  generateModelTests.set(false)
+  library.set("spring-boot")
+  modelNameSuffix.set("Dto")
+  configOptions.set(
+    mapOf(
+      "swaggerAnnotations" to "false",
+      "openApiNullable" to "true",
+      "interfaceOnly" to "true",
+      "hideGenerationTimestamp" to "true",
+      "skipDefaultInterface" to "true",
+      "useSwaggerUI" to "false",
+      "reactive" to "true",
+      "useSpringBoot3" to "true",
+      "useJakartaEe" to "true",
+      "oas3" to "true",
+      "generateSupportingFiles" to "true",
+      "enumPropertyNaming" to "UPPERCASE"
+    )
+  )
+}
+
 tasks.withType<Test> { useJUnitPlatform() }
+
+tasks.withType<KotlinCompile> {
+  dependsOn("fdrkpi-v1")
+  kotlinOptions.jvmTarget = "21"
+}
+
+tasks.named("build") { dependsOn("spotlessApply") }
 
 tasks.test {
   useJUnitPlatform()
