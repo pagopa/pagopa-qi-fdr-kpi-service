@@ -1,0 +1,397 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: pagoPA FdR KPI
+  description: |
+    API for retrieving FdR (Flusso di Rendicontazione) KPI metrics for both PSPs and PSP Brokers.
+    For direct PSP queries, use the PSP's fiscal code in the path.
+    For broker queries, use the broker's fiscal code in the path and specify the PSP code as a query parameter.
+servers:
+  - url: https://${host}
+
+paths:
+  /fdr-kpi/{entityFiscalCode}/{kpiType}/{period}:
+    get:
+      parameters:
+        - name: entityFiscalCode
+          in: path
+          required: true
+          schema:
+            type: string
+            example: ""
+          description: |
+            The fiscal code of the entity:
+            - For direct PSP queries: use PSP fiscal code
+            - For broker queries: use broker fiscal code
+
+        - name: kpiType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [ NRFDR, LFDR, WAFDR, WPNFDR ]
+          description: | 
+            The type of KPI to calculate
+
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [ daily, monthly ]
+          description: |
+            The time period granularity (single day or calendar month)
+
+        - name: pspCode
+          in: query
+          required: false
+          schema:
+            type: string
+            example: ""
+          description: |
+            PSP code - Required only for broker queries.
+            - If entityCode is a broker fiscal code: this parameter is required
+            - If entityCode is a PSP fiscal code: this parameter should not be provided (it would be a duplicate)
+
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2024-09-01"
+          description: |
+            Start date for the KPI calculation period.
+            For daily KPIs, dates must be at least 10 days before the current date.
+
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2024-09-30"
+          description: |
+            End date for the KPI calculation period.
+            For daily KPIs, dates must be at least 10 days before the current date.
+
+      responses:
+        '200':
+          description: KPI calculated
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/NRFDRMonthlyResponse'
+                  - $ref: '#/components/schemas/NRFDRDailyResponse'
+                  - $ref: '#/components/schemas/LFDRMonthlyResponse'
+                  - $ref: '#/components/schemas/LFDRDailyResponse'
+                  - $ref: '#/components/schemas/WAFDRMonthlyResponse'
+                  - $ref: '#/components/schemas/WAFDRDailyResponse'
+                  - $ref: '#/components/schemas/WPNFDRMonthlyResponse'
+                  - $ref: '#/components/schemas/WPNFDRDailyResponse'
+                  - $ref: '#/components/schemas/BrokerNRFDRMonthlyResponse'
+                  - $ref: '#/components/schemas/BrokerNRFDRDailyResponse'
+                  - $ref: '#/components/schemas/BrokerLFDRMonthlyResponse'
+                  - $ref: '#/components/schemas/BrokerLFDRDailyResponse'
+                  - $ref: '#/components/schemas/BrokerWAFDRMonthlyResponse'
+                  - $ref: '#/components/schemas/BrokerWAFDRDailyResponse'
+                  - $ref: '#/components/schemas/BrokerWPNFDRMonthlyResponse'
+                  - $ref: '#/components/schemas/BrokerWPNFDRDailyResponse'
+
+        '400':
+          description: |
+            Formally invalid input
+            Possible error types:
+            - DATE_TOO_RECENT: Daily KPI requests must be for dates at least 10 days in the past
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemJson'
+              examples:
+                dateTooRecent:
+                  value:
+                    title: "Date Too Recent"
+                    status: 400
+                    detail: "Daily KPI requests must be for dates at least 10 days in the past"
+        '404':
+          description: PSP or Broker not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemJson'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemJson'
+components:
+  schemas:
+    BaseKPIResponse:
+      type: object
+      required:
+        - KPI description
+        - KPI description url
+      properties:
+        KPI description:
+          type: string
+        KPI description url:
+          type: string
+          format: uri
+          example: https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement
+
+    PSPKPIResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseKPIResponse'
+        - type: object
+          required:
+            - ID_PSP
+            - KPI name
+          properties:
+            ID_PSP:
+              type: string
+              example: ""
+            KPI name:
+              type: string
+              example: "LFDR"
+
+    BrokerKPIResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseKPIResponse'
+        - type: object
+          required:
+            - ID_BROKER_PSP
+            - ID_PSP
+            - KPI name
+          properties:
+            ID_BROKER_PSP:
+              type: string
+              example: ""
+            ID_PSP:
+              type: string
+              example: ""
+            KPI name:
+              type: string
+              example: "LFDR"
+
+    MonthlyKPIValue:
+      type: object
+      required:
+        - KPI value
+      properties:
+        KPI value:
+          type: string
+          example: "0.05"
+
+    DailyKPIBase:
+      type: object
+      required:
+        - GIORNATA_PAGAMENTO
+        - TOTALE_FLUSSI
+      properties:
+        GIORNATA_PAGAMENTO:
+          type: string
+          format: date-time
+        TOTALE_FLUSSI:
+          type: integer
+
+    NRFDRMonthlyResponse:
+      allOf:
+        - $ref: '#/components/schemas/PSPKPIResponse'
+        - $ref: '#/components/schemas/MonthlyKPIValue'
+
+    NRFDRDailyResponse:
+      allOf:
+        - $ref: '#/components/schemas/PSPKPIResponse'
+        - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - FLUSSI_ASSENTI
+            - FLUSSI_PRESENTI
+          properties:
+            FLUSSI_ASSENTI:
+              type: integer
+            FLUSSI_PRESENTI:
+              type: integer
+
+    LFDRMonthlyResponse:
+      allOf:
+        - $ref: '#/components/schemas/PSPKPIResponse'
+        - type: object
+          required:
+            - KPI LFDR v1 value
+            - KPI LFDR v2 value
+          properties:
+            KPI LFDR v1 value:
+              type: string
+            KPI LFDR v2 value:
+              type: string
+
+    LFDRDailyResponse:
+      allOf:
+        - $ref: '#/components/schemas/PSPKPIResponse'
+        - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - FDR_IN_RITARDO_v1
+            - FDR_IN_RITARDO_v2
+          properties:
+            FDR_IN_RITARDO_v1:
+              type: integer
+            FDR_IN_RITARDO_v2:
+              type: integer
+
+    WAFDRMonthlyResponse:
+      allOf:
+        - $ref: '#/components/schemas/PSPKPIResponse'
+        - $ref: '#/components/schemas/MonthlyKPIValue'
+
+    WAFDRDailyResponse:
+      allOf:
+        - $ref: '#/components/schemas/PSPKPIResponse'
+        - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - TOTALE_DIFF_AMOUNT
+          properties:
+            TOTALE_DIFF_AMOUNT:
+              type: integer
+
+    WPNFDRMonthlyResponse:
+      allOf:
+        - $ref: '#/components/schemas/PSPKPIResponse'
+        - $ref: '#/components/schemas/MonthlyKPIValue'
+
+    WPNFDRDailyResponse:
+      allOf:
+        - $ref: '#/components/schemas/PSPKPIResponse'
+        - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - TOTALE_DIFF_NUM
+          properties:
+            TOTALE_DIFF_NUM:
+              type: integer
+
+    BrokerNRFDRMonthlyResponse:
+      allOf:
+        - $ref: '#/components/schemas/BrokerKPIResponse'
+        - $ref: '#/components/schemas/MonthlyKPIValue'
+
+    BrokerNRFDRDailyResponse:
+      allOf:
+        - $ref: '#/components/schemas/BrokerKPIResponse'
+        - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - FLUSSI_ASSENTI
+            - FLUSSI_PRESENTI
+          properties:
+            FLUSSI_ASSENTI:
+              type: integer
+            FLUSSI_PRESENTI:
+              type: integer
+
+    BrokerLFDRMonthlyResponse:
+      allOf:
+        - $ref: '#/components/schemas/BrokerKPIResponse'
+        - type: object
+          required:
+            - KPI LFDR v1 value
+            - KPI LFDR v2 value
+          properties:
+            KPI LFDR v1 value:
+              type: string
+            KPI LFDR v2 value:
+              type: string
+
+    BrokerLFDRDailyResponse:
+      allOf:
+        - $ref: '#/components/schemas/BrokerKPIResponse'
+        - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - FDR_IN_RITARDO_v1
+            - FDR_IN_RITARDO_v2
+          properties:
+            FDR_IN_RITARDO_v1:
+              type: integer
+            FDR_IN_RITARDO_v2:
+              type: integer
+
+    BrokerWAFDRMonthlyResponse:
+      allOf:
+        - $ref: '#/components/schemas/BrokerKPIResponse'
+        - $ref: '#/components/schemas/MonthlyKPIValue'
+
+    BrokerWAFDRDailyResponse:
+      allOf:
+        - $ref: '#/components/schemas/BrokerKPIResponse'
+        - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - TOTALE_DIFF_AMOUNT
+          properties:
+            TOTALE_DIFF_AMOUNT:
+              type: integer
+
+    BrokerWPNFDRMonthlyResponse:
+      allOf:
+        - $ref: '#/components/schemas/BrokerKPIResponse'
+        - $ref: '#/components/schemas/MonthlyKPIValue'
+
+    BrokerWPNFDRDailyResponse:
+      allOf:
+        - $ref: '#/components/schemas/BrokerKPIResponse'
+        - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - TOTALE_DIFF_NUM
+          properties:
+            TOTALE_DIFF_NUM:
+              type: integer
+
+    ProblemJson:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: |-
+            An absolute URI that identifies the problem type. When dereferenced,
+            it SHOULD provide human-readable documentation for the problem type
+            (e.g., using HTML).
+          default: about:blank
+          example: https://example.com/problem/constraint-violation
+        title:
+          type: string
+          description: |-
+            A short, summary of the problem type. Written in english and readable
+            for engineers (usually not suited for non technical stakeholders and
+            not localized); example: Service Unavailable
+        status:
+          $ref: '#/components/schemas/HttpStatusCode'
+        detail:
+          type: string
+          description: |-
+            A human readable explanation specific to this occurrence of the
+            problem.
+          example: There was an error processing the request
+        instance:
+          type: string
+          format: uri
+          description: |-
+            An absolute URI that identifies the specific occurrence of the problem.
+            It may or may not yield further information if dereferenced.
+
+    HttpStatusCode:
+      type: integer
+      format: int32
+      description: |-
+        The HTTP status code generated by the origin server for this occurrence
+        of the problem.
+      minimum: 100
+      maximum: 600
+      exclusiveMaximum: true
+      example: 200
