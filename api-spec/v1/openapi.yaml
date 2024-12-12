@@ -12,6 +12,7 @@ servers:
 paths:
   /fdr-kpi/{kpiType}/{period}:
     get:
+      operationId: calculateKpi
       parameters:
         - name: X-Entity-Fiscal-Code
           in: header
@@ -115,17 +116,28 @@ components:
     BaseKPIResponse:
       type: object
       required:
-        - KPI description
-        - KPI description url
+        - kpiDescription
+        - kpiDescriptionUrl
       properties:
-        KPI description:
+        kpiDescription:
           type: string
-        KPI description url:
+        kpiDescriptionUrl:
           type: string
           format: uri
           example: https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement
 
     KPIEntityResponse:
+      type: object
+      properties:
+        idPsp:
+          type: string
+          example: "CIPBITMM"
+        entityType:
+          type: string
+          enum: [ psp, broker ]
+        kpiName:
+          type: string
+          enum: [ NRFDR, LFDR, WAFDR, WPNFDR ]
       allOf:
         - $ref: '#/components/schemas/BaseKPIResponse'
         - type: object
@@ -134,100 +146,99 @@ components:
             mapping:
               psp: '#/components/schemas/PSPIdentifier'
               broker: '#/components/schemas/BrokerIdentifier'
-          properties:
-            entityType:
-              type: string
-              enum: [psp, broker]
-            KPI name:
-              type: string
-              enum: [NRFDR, LFDR, WAFDR, WPNFDR]
 
     PSPIdentifier:
       type: object
       required:
-        - ID_PSP
+        - idPsp
       properties:
-        ID_PSP:
+        idPsp:
           type: string
-          example: ""
+          example: "CIPBITMM"
 
     BrokerIdentifier:
       type: object
       required:
-        - ID_BROKER_PSP
-        - ID_PSP
+        - idBrokerPsp
+        - idPsp
       properties:
-        ID_BROKER_PSP:
+        idBrokerPsp:
           type: string
-          example: ""
-        ID_PSP:
+          example: "02654890025"
+        idPsp:
           type: string
-          example: ""
-
+          example: "CIPBITMM"
+          
     DailyKPIBase:
       type: object
       required:
-        - GIORNATA_PAGAMENTO
-        - TOTALE_FLUSSI
+        - dailyPayment
+        - totalReports
       properties:
-        GIORNATA_PAGAMENTO:
+        dailyPayment:
           type: string
           format: date-time
-        TOTALE_FLUSSI:
+        totalReports:
           type: integer
 
     MonthlyKPIBase:
       type: object
       required:
-        - KPI value
+        - kpiValue
       properties:
-        KPI value:
+        kpiValue:
           type: string
           example: "0.05"
 
     NRFDRMetrics:
       type: object
       required:
-        - FLUSSI_ASSENTI
-        - FLUSSI_PRESENTI
+        - missingReports
+        - foundReports
       properties:
-        FLUSSI_ASSENTI:
+        missingReports:
           type: integer
-        FLUSSI_PRESENTI:
+        foundReports:
           type: integer
 
     LFDRMetrics:
       type: object
       required:
-        - FDR_IN_RITARDO_v1
-        - FDR_IN_RITARDO_v2
+        - lateFdrV1
+        - lateFdrV2
       properties:
-        FDR_IN_RITARDO_v1:
+        lateFdrV1:
           type: integer
-        FDR_IN_RITARDO_v2:
+        lateFdrV2:
           type: integer
-        KPI LFDR v1 value:
+        kpiLfdrV1Value:
           type: string
-        KPI LFDR v2 value:
+        kpiLfdrV2Value:
           type: string
 
     WAFDRMetrics:
       type: object
       required:
-        - TOTALE_DIFF_AMOUNT
+        - totalDiffAmount
       properties:
-        TOTALE_DIFF_AMOUNT:
+        totalDiffAmount:
           type: integer
 
     WPNFDRMetrics:
       type: object
       required:
-        - TOTALE_DIFF_NUM
+        - totalDiffNum
       properties:
-        TOTALE_DIFF_NUM:
+        totalDiffNum:
           type: integer
 
     KPIResponse:
+      type: object
+      properties:
+        responseType:
+          type: string
+      required:
+        - responseType
       oneOf:
         - $ref: '#/components/schemas/DailyKPIResponse'
         - $ref: '#/components/schemas/MonthlyKPIResponse'
@@ -241,13 +252,20 @@ components:
       allOf:
         - $ref: '#/components/schemas/KPIEntityResponse'
         - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - responseType
+          properties:
+            responseType:
+              type: string
+              default: daily
         - oneOf:
             - $ref: '#/components/schemas/NRFDRMetrics'
             - $ref: '#/components/schemas/LFDRMetrics'
             - $ref: '#/components/schemas/WAFDRMetrics'
             - $ref: '#/components/schemas/WPNFDRMetrics'
       discriminator:
-        propertyName: KPI name
+        propertyName: kpiName
         mapping:
           NRFDR: '#/components/schemas/NRFDRMetrics'
           LFDR: '#/components/schemas/LFDRMetrics'
@@ -257,11 +275,18 @@ components:
     MonthlyKPIResponse:
       allOf:
         - $ref: '#/components/schemas/KPIEntityResponse'
+        - type: object
+          required:
+            - responseType
+          properties:
+             responseType:
+              type: string
+              default: monthly
         - oneOf:
             - $ref: '#/components/schemas/MonthlyKPIBase'
             - $ref: '#/components/schemas/LFDRMetrics'
       discriminator:
-        propertyName: KPI name
+        propertyName: kpiName
         mapping:
           NRFDR: '#/components/schemas/MonthlyKPIBase'
           LFDR: '#/components/schemas/LFDRMetrics'
