@@ -10,11 +10,11 @@ servers:
   - url: https://${host}
 
 paths:
-  /fdr-kpi/{entityFiscalCode}/{kpiType}/{period}:
+  /fdr-kpi/{kpiType}/{period}:
     get:
       parameters:
-        - name: entityFiscalCode
-          in: path
+        - name: X-Entity-Fiscal-Code
+          in: header
           required: true
           schema:
             type: string
@@ -24,13 +24,24 @@ paths:
             - For direct PSP queries: use PSP fiscal code
             - For broker queries: use broker fiscal code
 
+        - name: X-PSP-Code
+          in: header
+          required: false
+          schema:
+            type: string
+            example: ""
+          description: |
+            PSP code - Required only for broker queries.
+            - If entityCode is a broker fiscal code: this parameter is required
+            - If entityCode is a PSP fiscal code: this parameter should not be provided (it would be a duplicate)
+
         - name: kpiType
           in: path
           required: true
           schema:
             type: string
             enum: [ NRFDR, LFDR, WAFDR, WPNFDR ]
-          description: | 
+          description: |
             The type of KPI to calculate
 
         - name: period
@@ -41,17 +52,6 @@ paths:
             enum: [ daily, monthly ]
           description: |
             The time period granularity (single day or calendar month)
-
-        - name: pspCode
-          in: query
-          required: false
-          schema:
-            type: string
-            example: ""
-          description: |
-            PSP code - Required only for broker queries.
-            - If entityCode is a broker fiscal code: this parameter is required
-            - If entityCode is a PSP fiscal code: this parameter should not be provided (it would be a duplicate)
 
         - name: startDate
           in: query
@@ -81,24 +81,7 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/NRFDRMonthlyResponse'
-                  - $ref: '#/components/schemas/NRFDRDailyResponse'
-                  - $ref: '#/components/schemas/LFDRMonthlyResponse'
-                  - $ref: '#/components/schemas/LFDRDailyResponse'
-                  - $ref: '#/components/schemas/WAFDRMonthlyResponse'
-                  - $ref: '#/components/schemas/WAFDRDailyResponse'
-                  - $ref: '#/components/schemas/WPNFDRMonthlyResponse'
-                  - $ref: '#/components/schemas/WPNFDRDailyResponse'
-                  - $ref: '#/components/schemas/BrokerNRFDRMonthlyResponse'
-                  - $ref: '#/components/schemas/BrokerNRFDRDailyResponse'
-                  - $ref: '#/components/schemas/BrokerLFDRMonthlyResponse'
-                  - $ref: '#/components/schemas/BrokerLFDRDailyResponse'
-                  - $ref: '#/components/schemas/BrokerWAFDRMonthlyResponse'
-                  - $ref: '#/components/schemas/BrokerWAFDRDailyResponse'
-                  - $ref: '#/components/schemas/BrokerWPNFDRMonthlyResponse'
-                  - $ref: '#/components/schemas/BrokerWPNFDRDailyResponse'
-
+                $ref: '#/components/schemas/KPIResponse'
         '400':
           description: |
             Formally invalid input
@@ -126,6 +109,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemJson'
+
 components:
   schemas:
     BaseKPIResponse:
@@ -141,48 +125,44 @@ components:
           format: uri
           example: https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement
 
-    PSPKPIResponse:
+    KPIEntityResponse:
       allOf:
         - $ref: '#/components/schemas/BaseKPIResponse'
         - type: object
-          required:
-            - ID_PSP
-            - KPI name
+          discriminator:
+            propertyName: entityType
+            mapping:
+              psp: '#/components/schemas/PSPIdentifier'
+              broker: '#/components/schemas/BrokerIdentifier'
           properties:
-            ID_PSP:
+            entityType:
               type: string
-              example: ""
+              enum: [psp, broker]
             KPI name:
               type: string
-              example: "LFDR"
+              enum: [NRFDR, LFDR, WAFDR, WPNFDR]
 
-    BrokerKPIResponse:
-      allOf:
-        - $ref: '#/components/schemas/BaseKPIResponse'
-        - type: object
-          required:
-            - ID_BROKER_PSP
-            - ID_PSP
-            - KPI name
-          properties:
-            ID_BROKER_PSP:
-              type: string
-              example: ""
-            ID_PSP:
-              type: string
-              example: ""
-            KPI name:
-              type: string
-              example: "LFDR"
-
-    MonthlyKPIValue:
+    PSPIdentifier:
       type: object
       required:
-        - KPI value
+        - ID_PSP
       properties:
-        KPI value:
+        ID_PSP:
           type: string
-          example: "0.05"
+          example: ""
+
+    BrokerIdentifier:
+      type: object
+      required:
+        - ID_BROKER_PSP
+        - ID_PSP
+      properties:
+        ID_BROKER_PSP:
+          type: string
+          example: ""
+        ID_PSP:
+          type: string
+          example: ""
 
     DailyKPIBase:
       type: object
@@ -196,161 +176,97 @@ components:
         TOTALE_FLUSSI:
           type: integer
 
-    NRFDRMonthlyResponse:
-      allOf:
-        - $ref: '#/components/schemas/PSPKPIResponse'
-        - $ref: '#/components/schemas/MonthlyKPIValue'
+    MonthlyKPIBase:
+      type: object
+      required:
+        - KPI value
+      properties:
+        KPI value:
+          type: string
+          example: "0.05"
 
-    NRFDRDailyResponse:
+    NRFDRMetrics:
+      type: object
+      required:
+        - FLUSSI_ASSENTI
+        - FLUSSI_PRESENTI
+      properties:
+        FLUSSI_ASSENTI:
+          type: integer
+        FLUSSI_PRESENTI:
+          type: integer
+
+    LFDRMetrics:
+      type: object
+      required:
+        - FDR_IN_RITARDO_v1
+        - FDR_IN_RITARDO_v2
+      properties:
+        FDR_IN_RITARDO_v1:
+          type: integer
+        FDR_IN_RITARDO_v2:
+          type: integer
+        KPI LFDR v1 value:
+          type: string
+        KPI LFDR v2 value:
+          type: string
+
+    WAFDRMetrics:
+      type: object
+      required:
+        - TOTALE_DIFF_AMOUNT
+      properties:
+        TOTALE_DIFF_AMOUNT:
+          type: integer
+
+    WPNFDRMetrics:
+      type: object
+      required:
+        - TOTALE_DIFF_NUM
+      properties:
+        TOTALE_DIFF_NUM:
+          type: integer
+
+    KPIResponse:
+      oneOf:
+        - $ref: '#/components/schemas/DailyKPIResponse'
+        - $ref: '#/components/schemas/MonthlyKPIResponse'
+      discriminator:
+        propertyName: responseType
+        mapping:
+          daily: '#/components/schemas/DailyKPIResponse'
+          monthly: '#/components/schemas/MonthlyKPIResponse'
+
+    DailyKPIResponse:
       allOf:
-        - $ref: '#/components/schemas/PSPKPIResponse'
+        - $ref: '#/components/schemas/KPIEntityResponse'
         - $ref: '#/components/schemas/DailyKPIBase'
-        - type: object
-          required:
-            - FLUSSI_ASSENTI
-            - FLUSSI_PRESENTI
-          properties:
-            FLUSSI_ASSENTI:
-              type: integer
-            FLUSSI_PRESENTI:
-              type: integer
+        - oneOf:
+            - $ref: '#/components/schemas/NRFDRMetrics'
+            - $ref: '#/components/schemas/LFDRMetrics'
+            - $ref: '#/components/schemas/WAFDRMetrics'
+            - $ref: '#/components/schemas/WPNFDRMetrics'
+      discriminator:
+        propertyName: KPI name
+        mapping:
+          NRFDR: '#/components/schemas/NRFDRMetrics'
+          LFDR: '#/components/schemas/LFDRMetrics'
+          WAFDR: '#/components/schemas/WAFDRMetrics'
+          WPNFDR: '#/components/schemas/WPNFDRMetrics'
 
-    LFDRMonthlyResponse:
+    MonthlyKPIResponse:
       allOf:
-        - $ref: '#/components/schemas/PSPKPIResponse'
-        - type: object
-          required:
-            - KPI LFDR v1 value
-            - KPI LFDR v2 value
-          properties:
-            KPI LFDR v1 value:
-              type: string
-            KPI LFDR v2 value:
-              type: string
-
-    LFDRDailyResponse:
-      allOf:
-        - $ref: '#/components/schemas/PSPKPIResponse'
-        - $ref: '#/components/schemas/DailyKPIBase'
-        - type: object
-          required:
-            - FDR_IN_RITARDO_v1
-            - FDR_IN_RITARDO_v2
-          properties:
-            FDR_IN_RITARDO_v1:
-              type: integer
-            FDR_IN_RITARDO_v2:
-              type: integer
-
-    WAFDRMonthlyResponse:
-      allOf:
-        - $ref: '#/components/schemas/PSPKPIResponse'
-        - $ref: '#/components/schemas/MonthlyKPIValue'
-
-    WAFDRDailyResponse:
-      allOf:
-        - $ref: '#/components/schemas/PSPKPIResponse'
-        - $ref: '#/components/schemas/DailyKPIBase'
-        - type: object
-          required:
-            - TOTALE_DIFF_AMOUNT
-          properties:
-            TOTALE_DIFF_AMOUNT:
-              type: integer
-
-    WPNFDRMonthlyResponse:
-      allOf:
-        - $ref: '#/components/schemas/PSPKPIResponse'
-        - $ref: '#/components/schemas/MonthlyKPIValue'
-
-    WPNFDRDailyResponse:
-      allOf:
-        - $ref: '#/components/schemas/PSPKPIResponse'
-        - $ref: '#/components/schemas/DailyKPIBase'
-        - type: object
-          required:
-            - TOTALE_DIFF_NUM
-          properties:
-            TOTALE_DIFF_NUM:
-              type: integer
-
-    BrokerNRFDRMonthlyResponse:
-      allOf:
-        - $ref: '#/components/schemas/BrokerKPIResponse'
-        - $ref: '#/components/schemas/MonthlyKPIValue'
-
-    BrokerNRFDRDailyResponse:
-      allOf:
-        - $ref: '#/components/schemas/BrokerKPIResponse'
-        - $ref: '#/components/schemas/DailyKPIBase'
-        - type: object
-          required:
-            - FLUSSI_ASSENTI
-            - FLUSSI_PRESENTI
-          properties:
-            FLUSSI_ASSENTI:
-              type: integer
-            FLUSSI_PRESENTI:
-              type: integer
-
-    BrokerLFDRMonthlyResponse:
-      allOf:
-        - $ref: '#/components/schemas/BrokerKPIResponse'
-        - type: object
-          required:
-            - KPI LFDR v1 value
-            - KPI LFDR v2 value
-          properties:
-            KPI LFDR v1 value:
-              type: string
-            KPI LFDR v2 value:
-              type: string
-
-    BrokerLFDRDailyResponse:
-      allOf:
-        - $ref: '#/components/schemas/BrokerKPIResponse'
-        - $ref: '#/components/schemas/DailyKPIBase'
-        - type: object
-          required:
-            - FDR_IN_RITARDO_v1
-            - FDR_IN_RITARDO_v2
-          properties:
-            FDR_IN_RITARDO_v1:
-              type: integer
-            FDR_IN_RITARDO_v2:
-              type: integer
-
-    BrokerWAFDRMonthlyResponse:
-      allOf:
-        - $ref: '#/components/schemas/BrokerKPIResponse'
-        - $ref: '#/components/schemas/MonthlyKPIValue'
-
-    BrokerWAFDRDailyResponse:
-      allOf:
-        - $ref: '#/components/schemas/BrokerKPIResponse'
-        - $ref: '#/components/schemas/DailyKPIBase'
-        - type: object
-          required:
-            - TOTALE_DIFF_AMOUNT
-          properties:
-            TOTALE_DIFF_AMOUNT:
-              type: integer
-
-    BrokerWPNFDRMonthlyResponse:
-      allOf:
-        - $ref: '#/components/schemas/BrokerKPIResponse'
-        - $ref: '#/components/schemas/MonthlyKPIValue'
-
-    BrokerWPNFDRDailyResponse:
-      allOf:
-        - $ref: '#/components/schemas/BrokerKPIResponse'
-        - $ref: '#/components/schemas/DailyKPIBase'
-        - type: object
-          required:
-            - TOTALE_DIFF_NUM
-          properties:
-            TOTALE_DIFF_NUM:
-              type: integer
+        - $ref: '#/components/schemas/KPIEntityResponse'
+        - oneOf:
+            - $ref: '#/components/schemas/MonthlyKPIBase'
+            - $ref: '#/components/schemas/LFDRMetrics'
+      discriminator:
+        propertyName: KPI name
+        mapping:
+          NRFDR: '#/components/schemas/MonthlyKPIBase'
+          LFDR: '#/components/schemas/LFDRMetrics'
+          WAFDR: '#/components/schemas/MonthlyKPIBase'
+          WPNFDR: '#/components/schemas/MonthlyKPIBase'
 
     ProblemJson:
       type: object
