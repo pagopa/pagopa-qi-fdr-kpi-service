@@ -16,7 +16,14 @@ plugins {
   application // configures the JAR manifest, handles classpath dependencies etc.
 }
 
-repositories { mavenCentral() }
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
+
+object Dependencies {
+  const val ecsLoggingVersion = "1.5.0"
+}
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
 
@@ -61,6 +68,7 @@ dependencies {
   implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+  implementation("co.elastic.logging:logback-ecs-encoder:${Dependencies.ecsLoggingVersion}")
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
