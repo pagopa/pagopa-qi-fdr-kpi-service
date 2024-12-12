@@ -16,9 +16,18 @@ plugins {
   application // configures the JAR manifest, handles classpath dependencies etc.
 }
 
-repositories { mavenCentral() }
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
+
+object Dependencies {
+  const val ecsLoggingVersion = "1.5.0"
+}
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+
+configurations { compileOnly { extendsFrom(configurations.annotationProcessor.get()) } }
 
 configurations {
   implementation.configure {
@@ -29,6 +38,8 @@ configurations {
   compileOnly { extendsFrom(configurations.annotationProcessor.get()) }
 }
 
+kotlin { compilerOptions { freeCompilerArgs.addAll("-Xjsr305=strict") } }
+
 springBoot {
   mainClass.set("it.pagopa.qi.fdrkpiservice.PagopaQiFdrKpiServiceApplicationKt")
   buildInfo {
@@ -36,6 +47,15 @@ springBoot {
       additional.set(mapOf("description" to (project.description ?: "Default description")))
     }
   }
+}
+
+tasks.named<Jar>("jar") { enabled = false }
+
+tasks.create("applySemanticVersionPlugin") {
+  group = "semantic-versioning"
+  description = "Semantic versioning plugin"
+  dependsOn("prepareKotlinBuildScriptModel")
+  apply(plugin = "com.dipien.semantic-version")
 }
 
 dependencyLocking { lockAllConfigurations() }
@@ -48,6 +68,7 @@ dependencies {
   implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+  implementation("co.elastic.logging:logback-ecs-encoder:${Dependencies.ecsLoggingVersion}")
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -101,3 +122,9 @@ tasks.jacocoTestReport {
 
   reports { xml.required.set(true) }
 }
+
+/**
+ * Task used to expand application properties with build specific properties such as artifact name
+ * and version
+ */
+tasks.processResources { filesMatching("application.properties") { expand(project.properties) } }
