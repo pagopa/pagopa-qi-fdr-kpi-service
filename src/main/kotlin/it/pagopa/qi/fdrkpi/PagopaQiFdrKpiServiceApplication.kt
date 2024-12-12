@@ -1,4 +1,4 @@
-package it.pagopa.qi.fdrkpiservice
+package it.pagopa.qi.fdrkpi
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
