@@ -1,0 +1,30 @@
+services:
+
+  qi-fdr-kpi:
+    container_name: pagopa-qi-fdr-kpi-service
+    build:
+      dockerfile: Dockerfile
+      context: .
+    env_file:
+      - docker-local/qi-fdr-kpi/qi-fdr-kpi.env
+    ports:
+      - "8080:8080"
+    networks:
+      - pagopa-qi-fdr-kpi-net
+  azure-data-explorer:
+    container_name: azure-data-explorer
+    build:
+      context: docker-local/azure-data-explorer
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8080"
+    networks:
+      - pagopa-qi-fdr-kpi-net
+
+networks:
+  pagopa-qi-fdr-kpi-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.21.0.0/16
+          gateway: 10.21.0.1
