@@ -54,27 +54,15 @@ paths:
           description: |
             The time period granularity (single day or calendar month)
 
-        - name: startDate
+        - name: date
           in: query
           required: true
           schema:
             type: string
-            format: date
-            example: "2024-09-01"
+            example: "2024-09-15"
           description: |
-            Start date for the KPI calculation period.
-            For daily KPIs, dates must be at least 10 days before the current date.
-
-        - name: endDate
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-            example: "2024-09-30"
-          description: |
-            End date for the KPI calculation period.
-            For daily KPIs, dates must be at least 10 days before the current date.
+            For daily KPIs: Specify the full date (YYYY-MM-DD). Must be at least 10 days before current date.
+            For monthly KPIs: Specify year and month (YYYY-MM).
 
       responses:
         '200':
