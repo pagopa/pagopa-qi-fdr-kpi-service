@@ -5,7 +5,6 @@ import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseDto
 import it.pagopa.generated.qi.fdrkpi.v1.model.KPIResponseDto
 import it.pagopa.generated.qi.fdrkpi.v1.model.MonthlyKPIResponseDto
 import java.net.URI
-import java.time.LocalDate
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
@@ -20,10 +19,8 @@ class FdrKpiController : FdrKpiApi {
      *   fiscal code - For broker queries: use broker fiscal code (required)
      * @param kpiType The type of KPI to calculate (required)
      * @param period The time period granularity (single day or calendar month) (required)
-     * @param startDate Start date for the KPI calculation period. For daily KPIs, dates must be at
-     *   least 10 days before the current date. (required)
-     * @param endDate End date for the KPI calculation period. For daily KPIs, dates must be at
-     *   least 10 days before the current date. (required)
+     * @param date For daily KPIs: Specify the full date (YYYY-MM-DD). Must be at least 10 days
+     *   before current date. For monthly KPIs: Specify year and month (YYYY-MM). (required)
      * @param xPSPCode PSP code - Required only for broker queries. - If entityCode is a broker
      *   fiscal code: this parameter is required - If entityCode is a PSP fiscal code: this
      *   parameter should not be provided (it would be a duplicate) (optional)
@@ -36,11 +33,10 @@ class FdrKpiController : FdrKpiApi {
         xEntityFiscalCode: String?,
         kpiType: String?,
         period: String?,
-        startDate: LocalDate?,
-        endDate: LocalDate?,
+        date: String?,
         xPSPCode: String?,
         exchange: ServerWebExchange?
-    ): Mono<ResponseEntity<KPIResponseDto>>? {
+    ): Mono<ResponseEntity<KPIResponseDto>> {
         val response =
             MonthlyKPIResponseDto().apply {
                 responseType("monthly")
