@@ -1,0 +1,353 @@
+{
+  "info": {
+    "name": "QI FdR KPI LOCAL",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "QI FdR Calculate Monthly KPI - Success",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Calculate Monthly KPI - Success Response\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('responseType').to.equal('monthly');",
+              "    pm.expect(response).to.have.property('idPsp');",
+              "    pm.expect(response).to.have.property('kpiName');",
+              "    pm.expect(response).to.have.property('kpiDescription');",
+              "    pm.expect(response).to.have.property('kpiDescriptionUrl');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-entity-fiscal-code",
+            "value": "{{X-ENTITY-FISCAL-CODE}}",
+            "type": "text"
+          },
+          {
+            "key": "x-psp-code",
+            "value": "{{X-PSP-CODE}}",
+            "type": "text"
+          },
+          {
+            "key": "ocp-apim-subscription-key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE}}/{{PERIOD}}?date={{DATE}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "fdr-kpi",
+            "{{KPI_TYPE}}",
+            "{{PERIOD}}"
+          ],
+          "query": [
+            {
+              "key": "date",
+              "value": "{{DATE}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "QI FdR Calculate KPI - PSP Not Found",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"PSP Not Found - Status code is 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('status').to.equal(404);",
+              "    pm.expect(response).to.have.property('title');",
+              "    pm.expect(response).to.have.property('detail');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-entity-fiscal-code",
+            "value": "{{X-ENTITY-FISCAL-CODE-NOT-FOUND}}",
+            "type": "text"
+          },
+          {
+            "key": "x-psp-code",
+            "value": "{{X-PSP-CODE-NOT-FOUND}}",
+            "type": "text"
+          },
+          {
+            "key": "ocp-apim-subscription-key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE}}/{{PERIOD}}?date={{DATE}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "fdr-kpi",
+            "{{KPI_TYPE}}",
+            "{{PERIOD}}"
+          ],
+          "query": [
+            {
+              "key": "date",
+              "value": "{{DATE}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "QI FdR Calculate KPI - Invalid KPI Type",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Invalid KPI Type - Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('status').to.equal(400);",
+              "    pm.expect(response).to.have.property('title');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-entity-fiscal-code",
+            "value": "{{X-ENTITY-FISCAL-CODE}}",
+            "type": "text"
+          },
+          {
+            "key": "ocp-apim-subscription-key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_NOT_VALID}}/{{PERIOD}}?date={{DATE}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "fdr-kpi",
+            "{{KPI_TYPE_NOT_VALID}}",
+            "{{PERIOD}}"
+          ],
+          "query": [
+            {
+              "key": "date",
+              "value": "{{DATE}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "QI FdR Calculate KPI - Invalid Period",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Invalid Period - Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('status').to.equal(400);",
+              "    pm.expect(response).to.have.property('title');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-entity-fiscal-code",
+            "value": "{{X-ENTITY-FISCAL-CODE}}",
+            "type": "text"
+          },
+          {
+            "key": "ocp-apim-subscription-key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE}}/{{PERIOD_NOT_VALID}}?date={{DATE}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "fdr-kpi",
+            "{{KPI_TYPE}}",
+            "{{PERIOD_NOT_VALID}}"
+          ],
+          "query": [
+            {
+              "key": "date",
+              "value": "{{DATE}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "QI FdR Calculate KPI - Date Too Recent",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Date Too Recent - Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('status').to.equal(400);",
+              "    pm.expect(response.title).to.equal('Date Too Recent');",
+              "    pm.expect(response.detail).to.equal('Daily KPI requests must be for dates at least 10 days in the past');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-entity-fiscal-code",
+            "value": "{{X-ENTITY-FISCAL-CODE}}",
+            "type": "text"
+          },
+          {
+            "key": "ocp-apim-subscription-key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE}}/{{PERIOD}}?date={{DATE_TOO_RECENT}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "fdr-kpi",
+            "{{KPI_TYPE}}",
+            "{{PERIOD}}"
+          ],
+          "query": [
+            {
+              "key": "date",
+              "value": "{{DATE_TOO_RECENT}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "QI FdR Calculate KPI - Invalid Date Format",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Invalid Date Format - Status code is 400\", function () {",
+              "    pm.response.to.have.status(400);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('status').to.equal(400);",
+              "    pm.expect(response).to.have.property('title');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-entity-fiscal-code",
+            "value": "{{X-ENTITY-FISCAL-CODE}}",
+            "type": "text"
+          },
+          {
+            "key": "ocp-apim-subscription-key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE}}/{{PERIOD}}?date={{DATE_NOT_VALID}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "fdr-kpi",
+            "{{KPI_TYPE}}",
+            "{{PERIOD}}"
+          ],
+          "query": [
+            {
+              "key": "date",
+              "value": "{{DATE_NOT_VALID}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
