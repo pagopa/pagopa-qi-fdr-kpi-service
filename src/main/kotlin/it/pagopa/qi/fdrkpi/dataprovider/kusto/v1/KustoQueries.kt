@@ -1,4 +1,4 @@
-package it.pagopa.qi.fdrkpi.dataprovider.v1.kusto
+package it.pagopa.qi.fdrkpi.dataprovider.kusto.v1
 
 object KustoQueries {
 
