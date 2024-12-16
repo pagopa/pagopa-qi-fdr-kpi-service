@@ -1,4 +1,4 @@
-package it.pagopa.qi.fdrkpiservice
+package it.pagopa.qi.fdrkpi
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
