@@ -176,16 +176,7 @@ components:
         totalReports:
           type: integer
 
-    MonthlyKPIBase:
-      type: object
-      required:
-        - kpiValue
-      properties:
-        kpiValue:
-          type: string
-          example: "0.05"
-
-    NRFDRMetrics:
+    DailyNRFDRMetrics:
       type: object
       required:
         - missingReports
@@ -196,7 +187,16 @@ components:
         foundReports:
           type: integer
 
-    LFDRMetrics:
+    MonthlyNRFDRMetrics:
+      type: object
+      required:
+        - kpiValue
+      properties:
+        kpiValue:
+          type: string
+          example: "0.95"
+    
+    DailyLFDRMetrics:
       type: object
       required:
         - lateFdrV1
@@ -211,21 +211,52 @@ components:
         kpiLfdrV2Value:
           type: string
 
-    WAFDRMetrics:
+    MonthlyLFDRMetrics:
+      type: object
+      required:
+        - kpiLfdrV1Value
+        - kpiLfdrV2Value
+      properties:
+        kpiLfdrV1Value:
+          type: string
+          example: "0.05"
+        kpiLfdrV2Value:
+          type: string
+          example: "0.03"
+
+    DailyWAFDRMetrics:
       type: object
       required:
         - totalDiffAmount
       properties:
         totalDiffAmount:
           type: integer
+    
+    MonthlyWAFDRMetrics:
+      type: object
+      required:
+        - kpiValue
+      properties:
+        kpiValue:
+          type: string
+          example: "0.02"
 
-    WPNFDRMetrics:
+    DailyWPNFDRMetrics:
       type: object
       required:
         - totalDiffNum
       properties:
         totalDiffNum:
           type: integer
+    
+    MonthlyWPNFDRMetrics:
+      type: object
+      required:
+        - kpiValue
+      properties:
+        kpiValue:
+          type: string
+          example: "0.01"
 
     KPIResponse:
       type: object
@@ -254,18 +285,21 @@ components:
             responseType:
               type: string
               default: daily
-        - oneOf:
-            - $ref: '#/components/schemas/NRFDRMetrics'
-            - $ref: '#/components/schemas/LFDRMetrics'
-            - $ref: '#/components/schemas/WAFDRMetrics'
-            - $ref: '#/components/schemas/WPNFDRMetrics'
+      
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/DailyNRFDRMetrics'
+        - $ref: '#/components/schemas/DailyLFDRMetrics'
+        - $ref: '#/components/schemas/DailyWAFDRMetrics'
+        - $ref: '#/components/schemas/DailyWPNFDRMetrics'
+
       discriminator:
         propertyName: kpiName
         mapping:
-          NRFDR: '#/components/schemas/NRFDRMetrics'
-          LFDR: '#/components/schemas/LFDRMetrics'
-          WAFDR: '#/components/schemas/WAFDRMetrics'
-          WPNFDR: '#/components/schemas/WPNFDRMetrics'
+          NRFDR: '#/components/schemas/DailyNRFDRMetrics'
+          LFDR: '#/components/schemas/DailyLFDRMetrics'
+          WAFDR: '#/components/schemas/DailyWAFDRMetrics'
+          WPNFDR: '#/components/schemas/DailyWPNFDRMetrics'
 
     MonthlyKPIResponse:
       allOf:
@@ -274,19 +308,23 @@ components:
           required:
             - responseType
           properties:
-             responseType:
+            responseType:
               type: string
               default: monthly
-        - oneOf:
-            - $ref: '#/components/schemas/MonthlyKPIBase'
-            - $ref: '#/components/schemas/LFDRMetrics'
+      
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/MonthlyNRFDRMetrics'
+        - $ref: '#/components/schemas/MonthlyLFDRMetrics'
+        - $ref: '#/components/schemas/MonthlyWAFDRMetrics'
+        - $ref: '#/components/schemas/MonthlyWPNFDRMetrics'
       discriminator:
         propertyName: kpiName
         mapping:
-          NRFDR: '#/components/schemas/MonthlyKPIBase'
-          LFDR: '#/components/schemas/LFDRMetrics'
-          WAFDR: '#/components/schemas/MonthlyKPIBase'
-          WPNFDR: '#/components/schemas/MonthlyKPIBase'
+          NRFDR: '#/components/schemas/MonthlyNRFDRMetrics'
+          LFDR: '#/components/schemas/MonthlyLFDRMetrics'
+          WAFDR: '#/components/schemas/MonthlyWAFDRMetrics'
+          WPNFDR: '#/components/schemas/MonthlyWPNFDRMetrics'
 
     ProblemJson:
       type: object
