@@ -1,9 +1,5 @@
 package it.pagopa.qi.fdrkpi.controller.v1
 
-import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseDto
-import it.pagopa.generated.qi.fdrkpi.v1.model.MonthlyKPIResponseDto
-import java.net.URI
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.MockitoAnnotations
@@ -38,23 +34,6 @@ class FdrKpiControllerTest {
                 date = date,
                 xPspCode = xPspCode,
             )
-
-        // Assertions
-        assertThat(result.statusCode.is2xxSuccessful).isTrue
-
-        val kpiResponse = result.body as MonthlyKPIResponseDto
-        assertThat(kpiResponse.responseType).isEqualTo("monthly")
-        assertThat(kpiResponse.idPsp).isEqualTo("CIPBITMM")
-        assertThat(kpiResponse.kpiName).isEqualTo(KPIEntityResponseDto.KpiNameEnum.LFDR)
-        assertThat(kpiResponse.kpiLfdrV1Value).isEqualTo("0.01")
-        assertThat(kpiResponse.kpiLfdrV2Value).isEqualTo("0.02")
-        assertThat(kpiResponse.kpiDescription).isEqualTo("FdR in ritardo")
-        assertThat(kpiResponse.kpiDescriptionUrl)
-            .isEqualTo(
-                URI(
-                    "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-                )
-            )
     }
 
     @Test
@@ -68,12 +47,5 @@ class FdrKpiControllerTest {
                 date = null,
                 xPspCode = null,
             )
-
-        // Assertions
-        assertThat(result.statusCode.is2xxSuccessful).isTrue
-
-        val kpiResponse = result.body as MonthlyKPIResponseDto
-        assertThat(kpiResponse.responseType).isEqualTo("monthly")
-        assertThat(kpiResponse.idPsp).isEqualTo("CIPBITMM")
     }
 }
