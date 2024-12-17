@@ -66,10 +66,10 @@ dependencyLocking { lockAllConfigurations() }
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-  implementation("io.swagger.core.v3:swagger-annotations:2.2.8")
+  implementation("io.swagger.core.v3:swagger-annotations")
   implementation("jakarta.validation:jakarta.validation-api")
   implementation("jakarta.annotation:jakarta.annotation-api")
-  implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+  implementation("org.openapitools:jackson-databind-nullable")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   // Kotlin dependencies
