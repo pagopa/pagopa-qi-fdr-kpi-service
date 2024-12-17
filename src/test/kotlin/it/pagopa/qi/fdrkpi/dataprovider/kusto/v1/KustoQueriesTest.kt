@@ -120,4 +120,55 @@ class KustoQueriesTest {
             assertTrue(query.isNotBlank(), "Query should not be blank")
         }
     }
+
+    @Test
+    fun `All percentage queries should handle null and zero values`() {
+        val percentageQueries =
+            listOf(
+                KustoQueries.LFDR_PSP_QUERY to
+                    listOf("PERC_FLUSSI_RITARDO_v1", "PERC_FLUSSI_RITARDO_v2"),
+                KustoQueries.LFDR_BROKER_QUERY to
+                    listOf("PERC_FLUSSI_RITARDO_v1", "PERC_FLUSSI_RITARDO_v2"),
+                KustoQueries.NRFDR_PSP_QUERY to listOf("PERC_FLUSSI_ASSENTI"),
+                KustoQueries.NRFDR_BROKER_QUERY to listOf("PERC_FLUSSI_ASSENTI"),
+                KustoQueries.WPNFDR_PSP_QUERY to listOf("PERC_DIFF_NUM"),
+                KustoQueries.WPNFDR_BROKER_QUERY to listOf("PERC_DIFF_NUM"),
+                KustoQueries.WAFDR_PSP_QUERY to listOf("PERC_DIFF_AMOUNT"),
+                KustoQueries.WAFDR_BROKER_QUERY to listOf("PERC_DIFF_AMOUNT")
+            )
+
+        percentageQueries.forEach { (query, percentageFields) ->
+            assertNotNull(query)
+
+            assertTrue(
+                query.contains("TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI)"),
+                "Query should handle null and zero values for TOTALE_FLUSSI"
+            )
+
+            percentageFields.forEach { field ->
+                assertTrue(
+                    query.contains("extend $field = iff("),
+                    "Percentage field $field should use iff for null/zero handling"
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Non-percentage queries should not contain null zero handling`() {
+        val nonPercentageQueries =
+            listOf(
+                KustoQueries.TEST_CONNECTION_QUERY,
+                KustoQueries.AMOUNT_TO_TRANSFER_QUERY,
+                KustoQueries.TOTAL_FLOWS_QUERY
+            )
+
+        nonPercentageQueries.forEach { query ->
+            assertNotNull(query)
+            assertTrue(
+                !query.contains("iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI))"),
+                "Non-percentage queries should not contain null/zero handling"
+            )
+        }
+    }
 }

@@ -1,5 +1,23 @@
 package it.pagopa.qi.fdrkpi.dataprovider.kusto.v1
 
+/**
+ * Contains all Kusto queries used for KPI calculations.
+ *
+ * Common patterns used across queries:
+ *
+ * Null/Zero handling pattern:
+ * ```
+ * iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (VALUE * 100) / TOTALE_FLUSSI)
+ * ```
+ *
+ * This pattern is used to safely handle percentage calculations where TOTALE_FLUSSI is the
+ * denominator:
+ * - If TOTALE_FLUSSI is 0 → returns 0
+ * - If TOTALE_FLUSSI is null → returns 0
+ * - If TOTALE_FLUSSI has a valid non-zero value → calculates (VALUE * 100) / TOTALE_FLUSSI
+ *
+ * Example: For TOTALE_FLUSSI = 100 and VALUE = 5 → returns (5 * 100) / 100 = 5 (meaning 5%)
+ */
 object KustoQueries {
 
     /** Query to test database connection and show available tables */
@@ -20,8 +38,8 @@ object KustoQueries {
         | summarize TOTALE_FLUSSI=sum(TOTALE_FLUSSI),
                     FDR_IN_RITARDO_F=sum(FDR_IN_RITARDO_FIRST_VERSION),
                     FDR_IN_RITARDO_L=sum(FDR_IN_RITARDO_LAST_VERSION)
-        | extend PERC_FLUSSI_RITARDO_v1=(FDR_IN_RITARDO_F * 100) / TOTALE_FLUSSI
-        | extend PERC_FLUSSI_RITARDO_v2=(FDR_IN_RITARDO_L * 100) / TOTALE_FLUSSI
+        | extend PERC_FLUSSI_RITARDO_v1 = iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (FDR_IN_RITARDO_F * 100) / TOTALE_FLUSSI)
+        | extend PERC_FLUSSI_RITARDO_v2 = iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (FDR_IN_RITARDO_L * 100) / TOTALE_FLUSSI)
         | project PERC_FLUSSI_RITARDO_v1, PERC_FLUSSI_RITARDO_v2
     """
             .trimIndent()
@@ -37,8 +55,8 @@ object KustoQueries {
         | summarize TOTALE_FLUSSI=sum(TOTALE_FLUSSI),
                     FDR_IN_RITARDO_F=sum(FDR_IN_RITARDO_FIRST_VERSION),
                     FDR_IN_RITARDO_L=sum(FDR_IN_RITARDO_LAST_VERSION)
-        | extend PERC_FLUSSI_RITARDO_v1=(FDR_IN_RITARDO_F * 100) / TOTALE_FLUSSI
-        | extend PERC_FLUSSI_RITARDO_v2=(FDR_IN_RITARDO_L * 100) / TOTALE_FLUSSI
+        | extend PERC_FLUSSI_RITARDO_v1 = iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (FDR_IN_RITARDO_F * 100) / TOTALE_FLUSSI)
+        | extend PERC_FLUSSI_RITARDO_v2 = iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (FDR_IN_RITARDO_L * 100) / TOTALE_FLUSSI)
         | project PERC_FLUSSI_RITARDO_v1, PERC_FLUSSI_RITARDO_v2
     """
             .trimIndent()
@@ -55,7 +73,7 @@ object KustoQueries {
                     FDR_ASSENTI=sum(FLUSSI_ASSENTI),
                     FDR_PRESENTI=sum(FLUSSI_PRESENTI)
         by ID_PSP
-        | extend PERC_FLUSSI_ASSENTI=(FDR_ASSENTI * 100) / TOTALE_FLUSSI
+        | extend PERC_FLUSSI_ASSENTI = iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (FDR_ASSENTI * 100) / TOTALE_FLUSSI)
         | project PERC_FLUSSI_ASSENTI
     """
             .trimIndent()
@@ -72,7 +90,7 @@ object KustoQueries {
                     FDR_ASSENTI=sum(FLUSSI_ASSENTI),
                     FDR_PRESENTI=sum(FLUSSI_PRESENTI)
         by ID_PSP
-        | extend PERC_FLUSSI_ASSENTI=(FDR_ASSENTI * 100) / TOTALE_FLUSSI
+        | extend PERC_FLUSSI_ASSENTI = iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (FDR_ASSENTI * 100) / TOTALE_FLUSSI)
         | project PERC_FLUSSI_ASSENTI
     """
             .trimIndent()
@@ -89,7 +107,7 @@ object KustoQueries {
         | where ID_PSP == "${'$'}PSP"
         | summarize TOTALE_FLUSSI=sum(TOTALE_FLUSSI),
                     TOTALE_DIFF_NUM=sum(TOTALE_DIFF_NUM)
-        | extend PERC_DIFF_NUM=(TOTALE_DIFF_NUM * 100) / TOTALE_FLUSSI
+        | extend PERC_DIFF_NUM = iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (TOTALE_DIFF_NUM * 100) / TOTALE_FLUSSI)
         | project PERC_DIFF_NUM
     """
             .trimIndent()
@@ -107,7 +125,7 @@ object KustoQueries {
         | where ID_BROKER_PSP == ${'$'}Int_psp
         | summarize TOTALE_FLUSSI=sum(TOTALE_FLUSSI),
                     TOTALE_DIFF_NUM=sum(TOTALE_DIFF_NUM)
-        | extend PERC_DIFF_NUM=(TOTALE_DIFF_NUM * 100) / TOTALE_FLUSSI
+        | extend PERC_DIFF_NUM = iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (TOTALE_DIFF_NUM * 100) / TOTALE_FLUSSI)
         | project PERC_DIFF_NUM
     """
             .trimIndent()
@@ -122,7 +140,7 @@ object KustoQueries {
         | where ID_PSP == "${'$'}PSP"
         | summarize TOTALE_FLUSSI=sum(TOTALE_FLUSSI),
                     TOTALE_DIFF_AMOUNT=sum(TOTALE_DIFF_AMOUNT)
-        | extend PERC_DIFF_AMOUNT=(TOTALE_DIFF_AMOUNT * 100) / TOTALE_FLUSSI
+        | extend PERC_DIFF_AMOUNT = iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (TOTALE_DIFF_AMOUNT * 100) / TOTALE_FLUSSI)
         | project PERC_DIFF_AMOUNT
     """
             .trimIndent()
@@ -137,7 +155,7 @@ object KustoQueries {
         | where ID_BROKER_PSP == ${'$'}Int_psp
         | summarize TOTALE_FLUSSI=sum(TOTALE_FLUSSI),
                     TOTALE_DIFF_AMOUNT=sum(TOTALE_DIFF_AMOUNT)
-        | extend PERC_DIFF_AMOUNT=(TOTALE_DIFF_AMOUNT * 100) / TOTALE_FLUSSI
+        | extend PERC_DIFF_AMOUNT = iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (TOTALE_DIFF_AMOUNT * 100) / TOTALE_FLUSSI)
         | project PERC_DIFF_AMOUNT
     """
             .trimIndent()
