@@ -1,14 +1,11 @@
 package it.pagopa.qi.fdrkpi.controller.v1
 
 import it.pagopa.generated.qi.fdrkpi.v1.api.FdrKpiApi
-import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseDto
 import it.pagopa.generated.qi.fdrkpi.v1.model.KPIResponseDto
 import it.pagopa.generated.qi.fdrkpi.v1.model.MonthlyKPIResponseDto
 import java.net.URI
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ServerWebExchange
-import reactor.core.publisher.Mono
 
 @RestController("FdrKpiV1Controller")
 class FdrKpiController : FdrKpiApi {
@@ -34,24 +31,20 @@ class FdrKpiController : FdrKpiApi {
         kpiType: String?,
         period: String?,
         date: String?,
-        xPspCode: String?,
-        exchange: ServerWebExchange?
-    ): Mono<ResponseEntity<KPIResponseDto>> {
+        xPspCode: String?
+    ): ResponseEntity<KPIResponseDto> {
         val response =
-            MonthlyKPIResponseDto().apply {
-                responseType("monthly")
-                idPsp("CIPBITMM")
-                kpiName(KPIEntityResponseDto.KpiNameEnum.LFDR)
-                kpiLfdrV1Value("0.01")
-                kpiLfdrV2Value("0.02")
-                kpiDescription("FdR in ritardo")
-                kpiDescriptionUrl(
-                    URI(
-                        "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-                    )
+            MonthlyKPIResponseDto(
+                "monthly",
+                "0.05",
+                1,
+                1,
+                "FdR in ritardo",
+                URI(
+                    "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
                 )
-            }
+            )
 
-        return Mono.just(ResponseEntity.ok(response))
+        return ResponseEntity.ok(response)
     }
 }
