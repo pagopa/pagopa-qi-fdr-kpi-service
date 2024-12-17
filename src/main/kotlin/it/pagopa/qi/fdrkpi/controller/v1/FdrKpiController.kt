@@ -7,8 +7,6 @@ import it.pagopa.generated.qi.fdrkpi.v1.model.MonthlyKPIResponseDto
 import java.net.URI
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ServerWebExchange
-import reactor.core.publisher.Mono
 
 @RestController("FdrKpiV1Controller")
 class FdrKpiController : FdrKpiApi {
@@ -34,9 +32,8 @@ class FdrKpiController : FdrKpiApi {
         kpiType: String?,
         period: String?,
         date: String?,
-        xPspCode: String?,
-        exchange: ServerWebExchange?
-    ): Mono<ResponseEntity<KPIResponseDto>> {
+        xPspCode: String?
+    ): ResponseEntity<KPIResponseDto> {
         val response =
             MonthlyKPIResponseDto().apply {
                 responseType("monthly")
@@ -52,6 +49,6 @@ class FdrKpiController : FdrKpiApi {
                 )
             }
 
-        return Mono.just(ResponseEntity.ok(response))
+        return ResponseEntity.ok(response)
     }
 }
