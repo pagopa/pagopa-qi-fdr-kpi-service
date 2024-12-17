@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "it.pagopa.qi"
 
-version = "0.0.0"
+version = "0.0.1"
 
 description = "pagopa-qi-fdr-kpi-service"
 
