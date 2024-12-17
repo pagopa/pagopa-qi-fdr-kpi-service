@@ -66,10 +66,8 @@ dependencyLocking { lockAllConfigurations() }
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-  implementation("io.swagger.core.v3:swagger-annotations")
   implementation("jakarta.validation:jakarta.validation-api")
   implementation("jakarta.annotation:jakarta.annotation-api")
-  implementation("org.openapitools:jackson-databind-nullable")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   // Kotlin dependencies
@@ -77,6 +75,10 @@ dependencies {
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
   implementation("co.elastic.logging:logback-ecs-encoder:${Dependencies.ecsLoggingVersion}")
+  implementation("com.microsoft.azure.kusto:kusto-ingest:6.0.0")
+  implementation("com.microsoft.azure.kusto:kusto-data:6.0.0")
+  implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+  implementation("io.swagger.core.v3:swagger-annotations:2.2.8")
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
