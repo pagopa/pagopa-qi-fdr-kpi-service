@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "it.pagopa.qi"
 
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1"
 
 description = "pagopa-qi-fdr-kpi-service"
 
@@ -54,7 +54,7 @@ springBoot {
 
 tasks.named<Jar>("jar") { enabled = false }
 
-tasks.register("applySemanticVersionPlugin") {
+tasks.create("applySemanticVersionPlugin") {
   group = "semantic-versioning"
   description = "Semantic versioning plugin"
   dependsOn("prepareKotlinBuildScriptModel")
