@@ -1,8 +1,7 @@
 package it.pagopa.qi.fdrkpi.controller.v1
 
 import it.pagopa.generated.qi.fdrkpi.v1.api.FdrKpiApi
-import it.pagopa.generated.qi.fdrkpi.v1.model.KPIResponseDto
-import it.pagopa.generated.qi.fdrkpi.v1.model.MonthlyKPIResponseDto
+import it.pagopa.generated.qi.fdrkpi.v1.model.*
 import java.net.URI
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
@@ -34,17 +33,17 @@ class FdrKpiController : FdrKpiApi {
         xPspCode: String?
     ): ResponseEntity<KPIResponseDto> {
         val response =
-            MonthlyKPIResponseDto(
+            MonthlyLFDRMetricsDto(
                 "monthly",
                 "0.05",
-                1,
-                1,
+                "0.03",
                 "FdR in ritardo",
                 URI(
                     "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-                )
+                ),
+                KPIEntityResponseAllOfDto.EntityTypeEnum.PSP,
+                KPIEntityResponseAllOfDto.KpiNameEnum.LFDR
             )
-
         return ResponseEntity.ok(response)
     }
 }
