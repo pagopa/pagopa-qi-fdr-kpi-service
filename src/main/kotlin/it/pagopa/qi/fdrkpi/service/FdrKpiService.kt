@@ -39,8 +39,7 @@ class FdrKpiService(
                 executeQuery(
                     KustoQueries.TOTAL_FLOWS_QUERY,
                     dateRange,
-                    xEntityFiscalCode,
-                    reKustoClient
+                    xEntityFiscalCode
                 )[0]
                     as Int
         }
@@ -48,7 +47,7 @@ class FdrKpiService(
         return when {
             KpiNameEnum.valueOf(kpiType) == KpiNameEnum.LFDR -> {
                 val result =
-                    executeQuery(LFDR_PSP_QUERY, dateRange, xEntityFiscalCode, reKustoClient)
+                    executeQuery(LFDR_PSP_QUERY, dateRange, xEntityFiscalCode)
                 when (FdrKpiPeriod.valueOf(period)) {
                     FdrKpiPeriod.daily ->
                         dailyPspLfdrBuilder(
@@ -68,7 +67,7 @@ class FdrKpiService(
             }
             KpiNameEnum.valueOf(kpiType) == KpiNameEnum.WAFDR -> {
                 val rows =
-                    executeQuery(WAFDR_PSP_QUERY, dateRange, xEntityFiscalCode, reKustoClient)
+                    executeQuery(WAFDR_PSP_QUERY, dateRange, xEntityFiscalCode)
                 when (FdrKpiPeriod.valueOf(period)) {
                     FdrKpiPeriod.daily ->
                         dailyWafdrBuilder(
@@ -83,7 +82,7 @@ class FdrKpiService(
             }
             KpiNameEnum.valueOf(kpiType) == KpiNameEnum.NRFDR -> {
                 val rows =
-                    executeQuery(NRFDR_PSP_QUERY, dateRange, xEntityFiscalCode, reKustoClient)
+                    executeQuery(NRFDR_PSP_QUERY, dateRange, xEntityFiscalCode)
                 when (FdrKpiPeriod.valueOf(period)) {
                     FdrKpiPeriod.daily ->
                         dailyNrfdrBuilder(
@@ -99,7 +98,7 @@ class FdrKpiService(
             }
             KpiNameEnum.valueOf(kpiType) == KpiNameEnum.WPNFDR -> {
                 val rows =
-                    executeQuery(WPNFDR_PSP_QUERY, dateRange, xEntityFiscalCode, reKustoClient)
+                    executeQuery(WPNFDR_PSP_QUERY, dateRange, xEntityFiscalCode)
                 when (FdrKpiPeriod.valueOf(period)) {
                     FdrKpiPeriod.daily ->
                         dailyWpnfdrBuilder(
@@ -114,5 +113,21 @@ class FdrKpiService(
             }
             else -> throw IllegalArgumentException("error")
         }
+    }
+
+    private fun executeQuery(
+        query: String,
+        dateRange: Pair<LocalDate, LocalDate>,
+        xPspCode: String
+    ): List<Any> {
+        val result =
+            reKustoClient.executeQuery(
+                preparePspQuery(query, dateRange.first, dateRange.second, xPspCode)
+            )
+        val primaryResult = result.primaryResults
+        while (primaryResult.next()) {
+            return primaryResult.currentRow
+        }
+        throw IllegalArgumentException("error")
     }
 }
