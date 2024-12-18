@@ -122,20 +122,22 @@ components:
           example: https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement
 
     KPIEntityResponse:
-      type: object
-      properties:
-        idPsp:
-          type: string
-          example: "CIPBITMM"
-        entityType:
-          type: string
-          enum: [ psp, broker ]
-        kpiName:
-          type: string
-          enum: [ NRFDR, LFDR, WAFDR, WPNFDR ]
       allOf:
         - $ref: '#/components/schemas/BaseKPIResponse'
         - type: object
+          required:
+            - entityType
+            - kpiName
+          properties:
+            idPsp:
+              type: string
+              example: "CIPBITMM"
+            entityType:
+              type: string
+              enum: [ psp, broker ]
+            kpiName:
+              type: string
+              enum: [ NRFDR, LFDR, WAFDR, WPNFDR ]
           discriminator:
             propertyName: entityType
             mapping:
@@ -167,10 +169,10 @@ components:
     DailyKPIBase:
       type: object
       required:
-        - dailyPayment
+        - paymentDate
         - totalReports
       properties:
-        dailyPayment:
+        paymentDate:
           type: string
           format: date-time
         totalReports:
@@ -183,110 +185,142 @@ components:
       properties:
         kpiValue:
           type: string
-          example: "0.05"
+          example: "0.95"
 
-    NRFDRMetrics:
-      type: object
-      required:
-        - missingReports
-        - foundReports
-      properties:
-        missingReports:
-          type: integer
-        foundReports:
-          type: integer
-
-    LFDRMetrics:
-      type: object
-      required:
-        - lateFdrV1
-        - lateFdrV2
-      properties:
-        lateFdrV1:
-          type: integer
-        lateFdrV2:
-          type: integer
-        kpiLfdrV1Value:
-          type: string
-        kpiLfdrV2Value:
-          type: string
-
-    WAFDRMetrics:
-      type: object
-      required:
-        - totalDiffAmount
-      properties:
-        totalDiffAmount:
-          type: integer
-
-    WPNFDRMetrics:
-      type: object
-      required:
-        - totalDiffNum
-      properties:
-        totalDiffNum:
-          type: integer
-
-    KPIResponse:
-      type: object
-      properties:
-        responseType:
-          type: string
-      required:
-        - responseType
-      oneOf:
-        - $ref: '#/components/schemas/DailyKPIResponse'
-        - $ref: '#/components/schemas/MonthlyKPIResponse'
-      discriminator:
-        propertyName: responseType
-        mapping:
-          daily: '#/components/schemas/DailyKPIResponse'
-          monthly: '#/components/schemas/MonthlyKPIResponse'
-
-    DailyKPIResponse:
+    DailyNRFDRMetrics:
       allOf:
         - $ref: '#/components/schemas/KPIEntityResponse'
         - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - missingReports
+            - foundReports
+            - responseType
+          properties:
+            responseType:
+              type: string
+              default: daily
+            missingReports:
+              type: integer
+            foundReports:
+              type: integer
+
+    MonthlyNRFDRMetrics:
+      allOf:
+        - $ref: '#/components/schemas/KPIEntityResponse'
+        - $ref: '#/components/schemas/MonthlyKPIBase'
         - type: object
           required:
             - responseType
           properties:
             responseType:
               type: string
-              default: daily
-        - oneOf:
-            - $ref: '#/components/schemas/NRFDRMetrics'
-            - $ref: '#/components/schemas/LFDRMetrics'
-            - $ref: '#/components/schemas/WAFDRMetrics'
-            - $ref: '#/components/schemas/WPNFDRMetrics'
-      discriminator:
-        propertyName: kpiName
-        mapping:
-          NRFDR: '#/components/schemas/NRFDRMetrics'
-          LFDR: '#/components/schemas/LFDRMetrics'
-          WAFDR: '#/components/schemas/WAFDRMetrics'
-          WPNFDR: '#/components/schemas/WPNFDRMetrics'
+              default: monthly
 
-    MonthlyKPIResponse:
+    DailyLFDRMetrics:
+      allOf:
+        - $ref: '#/components/schemas/KPIEntityResponse'
+        - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - lateFdrV1
+            - lateFdrV2
+            - responseType
+          properties:
+            responseType:
+              type: string
+              default: daily
+            lateFdrV1:
+              type: integer
+            lateFdrV2:
+              type: integer
+
+    MonthlyLFDRMetrics:
       allOf:
         - $ref: '#/components/schemas/KPIEntityResponse'
         - type: object
           required:
+            - kpiLfdrV1Value
+            - kpiLfdrV2Value
             - responseType
           properties:
-             responseType:
+            responseType:
               type: string
               default: monthly
-        - oneOf:
-            - $ref: '#/components/schemas/MonthlyKPIBase'
-            - $ref: '#/components/schemas/LFDRMetrics'
+            kpiLfdrV1Value:
+              type: string
+              example: "0.05"
+            kpiLfdrV2Value:
+              type: string
+              example: "0.03"
+
+    DailyWAFDRMetrics:
+      allOf:
+        - $ref: '#/components/schemas/KPIEntityResponse'
+        - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - totalDiffAmount
+            - responseType
+          properties:
+            responseType:
+              type: string
+              default: daily
+            totalDiffAmount:
+              type: integer
+
+    MonthlyWAFDRMetrics:
+      allOf:
+        - $ref: '#/components/schemas/KPIEntityResponse'
+        - $ref: '#/components/schemas/MonthlyKPIBase'
+        - type: object
+          required:
+            - responseType
+          properties:
+            responseType:
+              type: string
+              default: monthly
+
+    DailyWPNFDRMetrics:
+      allOf:
+        - $ref: '#/components/schemas/KPIEntityResponse'
+        - $ref: '#/components/schemas/DailyKPIBase'
+        - type: object
+          required:
+            - totalDiffNum
+            - responseType
+          properties:
+            responseType:
+              type: string
+              default: daily
+            totalDiffNum:
+              type: integer
+
+    MonthlyWPNFDRMetrics:
+      allOf:
+        - $ref: '#/components/schemas/KPIEntityResponse'
+        - $ref: '#/components/schemas/MonthlyKPIBase'
+        - type: object
+          required:
+            - responseType
+          properties:
+            responseType:
+              type: string
+              default: monthly
+
+    KPIResponse:
+      type: object
       discriminator:
-        propertyName: kpiName
-        mapping:
-          NRFDR: '#/components/schemas/MonthlyKPIBase'
-          LFDR: '#/components/schemas/LFDRMetrics'
-          WAFDR: '#/components/schemas/MonthlyKPIBase'
-          WPNFDR: '#/components/schemas/MonthlyKPIBase'
+        propertyName: responseType
+      oneOf:
+        - $ref: '#/components/schemas/DailyNRFDRMetrics'
+        - $ref: '#/components/schemas/DailyLFDRMetrics'
+        - $ref: '#/components/schemas/DailyWAFDRMetrics'
+        - $ref: '#/components/schemas/DailyWPNFDRMetrics'
+        - $ref: '#/components/schemas/MonthlyNRFDRMetrics'
+        - $ref: '#/components/schemas/MonthlyLFDRMetrics'
+        - $ref: '#/components/schemas/MonthlyWAFDRMetrics'
+        - $ref: '#/components/schemas/MonthlyWPNFDRMetrics'
 
     ProblemJson:
       type: object
