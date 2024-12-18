@@ -42,7 +42,7 @@ class FdrKpiControllerTest {
 
         val result =
             fdrKpiController.calculateKpi(
-                xEntityFiscalCode = null,
+                xEntityFiscalCode = "",
                 kpiType = "",
                 period = "",
                 date = "",

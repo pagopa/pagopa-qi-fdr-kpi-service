@@ -27,14 +27,13 @@ class FdrKpiController(@Autowired private val fdrKpiService: FdrKpiService) : Fd
      *   code 500)
      */
     override fun calculateKpi(
-        xEntityFiscalCode: String?,
+        xEntityFiscalCode: String,
         kpiType: String,
         period: String,
         date: String,
-        xPspCode: String
+        xPspCode: String?
     ): ResponseEntity<KPIResponseDto> {
-        val response =
-            fdrKpiService.calculateKpi(xEntityFiscalCode, kpiType, period, date, xPspCode)
+        val response = fdrKpiService.calculateKpi(xEntityFiscalCode, kpiType, period, date)
         return ResponseEntity.ok(response)
     }
 }

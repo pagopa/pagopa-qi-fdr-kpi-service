@@ -5,6 +5,10 @@ import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseAllOfDto.EntityTy
 import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseAllOfDto.KpiNameEnum
 import it.pagopa.generated.qi.fdrkpi.v1.model.KPIResponseDto
 import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries
+import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.LFDR_PSP_QUERY
+import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.NRFDR_PSP_QUERY
+import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.WAFDR_PSP_QUERY
+import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.WPNFDR_PSP_QUERY
 import it.pagopa.qi.fdrkpi.utils.*
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -22,23 +26,20 @@ class FdrKpiService(
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     fun calculateKpi(
-        xEntityFiscalCode: String?,
+        xEntityFiscalCode: String,
         kpiType: String,
         period: String,
-        date: String,
-        xPspCode: String
+        date: String
     ): KPIResponseDto {
         val dateRange: Pair<LocalDate, LocalDate> = getDateRange(period, date)
-        val typeEnum = if (xEntityFiscalCode != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
         var totalReports = 0
 
         if (FdrKpiPeriod.daily == FdrKpiPeriod.valueOf(period)) {
             totalReports =
-                extractResult(
+                executeQuery(
                     KustoQueries.TOTAL_FLOWS_QUERY,
-                    typeEnum,
                     dateRange,
-                    xPspCode,
+                    xEntityFiscalCode,
                     reKustoClient
                 )[0]
                     as Int
@@ -47,13 +48,7 @@ class FdrKpiService(
         return when {
             KpiNameEnum.valueOf(kpiType) == KpiNameEnum.LFDR -> {
                 val result =
-                    executeLfdrQuery(
-                        typeEnum,
-                        dateRange,
-                        xPspCode,
-                        xEntityFiscalCode,
-                        reKustoClient
-                    )
+                    executeQuery(LFDR_PSP_QUERY, dateRange, xEntityFiscalCode, reKustoClient)
                 when (FdrKpiPeriod.valueOf(period)) {
                     FdrKpiPeriod.daily ->
                         dailyPspLfdrBuilder(
@@ -61,72 +56,60 @@ class FdrKpiService(
                             totalReports,
                             result[0] as Int,
                             result[1] as Int,
-                            typeEnum
+                            EntityTypeEnum.PSP
                         )
                     FdrKpiPeriod.monthly ->
-                        monthlyLfdrBuilder(result[0] as String, result[1] as String, typeEnum)
+                        monthlyLfdrBuilder(
+                            (result[0] as Int).toString(),
+                            (result[1] as Int).toString(),
+                            EntityTypeEnum.PSP
+                        )
                 }
             }
             KpiNameEnum.valueOf(kpiType) == KpiNameEnum.WAFDR -> {
                 val rows =
-                    executeWafdrQuery(
-                        typeEnum,
-                        dateRange,
-                        xPspCode,
-                        xEntityFiscalCode,
-                        reKustoClient
-                    )
+                    executeQuery(WAFDR_PSP_QUERY, dateRange, xEntityFiscalCode, reKustoClient)
                 when (FdrKpiPeriod.valueOf(period)) {
                     FdrKpiPeriod.daily ->
                         dailyWafdrBuilder(
                             OffsetDateTime.of(dateRange.first.atStartOfDay(), ZoneOffset.UTC),
                             totalReports,
                             rows[0] as Int,
-                            typeEnum
+                            EntityTypeEnum.PSP
                         )
-                    FdrKpiPeriod.monthly -> monthlyWafdrBuilder(rows[0] as String, typeEnum)
+                    FdrKpiPeriod.monthly ->
+                        monthlyWafdrBuilder((rows[0] as Int).toString(), EntityTypeEnum.PSP)
                 }
             }
             KpiNameEnum.valueOf(kpiType) == KpiNameEnum.NRFDR -> {
                 val rows =
-                    executeNrfdrQuery(
-                        typeEnum,
-                        dateRange,
-                        xPspCode,
-                        xEntityFiscalCode,
-                        reKustoClient
-                    )
+                    executeQuery(NRFDR_PSP_QUERY, dateRange, xEntityFiscalCode, reKustoClient)
                 when (FdrKpiPeriod.valueOf(period)) {
                     FdrKpiPeriod.daily ->
                         dailyNrfdrBuilder(
                             OffsetDateTime.of(dateRange.first.atStartOfDay(), ZoneOffset.UTC),
                             totalReports,
                             rows[0] as Int,
-                            rows[1] as Int,
-                            typeEnum
+                            0, // TODO
+                            EntityTypeEnum.PSP
                         )
-                    FdrKpiPeriod.monthly -> monthlyNrfdrBuilder(rows[0] as String, typeEnum)
+                    FdrKpiPeriod.monthly ->
+                        monthlyNrfdrBuilder((rows[0] as Int).toString(), EntityTypeEnum.PSP)
                 }
             }
-            KpiNameEnum.valueOf(kpiType) == KpiNameEnum.WPNFDR &&
-                FdrKpiPeriod.daily == FdrKpiPeriod.valueOf(period) -> {
+            KpiNameEnum.valueOf(kpiType) == KpiNameEnum.WPNFDR -> {
                 val rows =
-                    executeWpnfdrQuery(
-                        typeEnum,
-                        dateRange,
-                        xPspCode,
-                        xEntityFiscalCode,
-                        reKustoClient
-                    )
+                    executeQuery(WPNFDR_PSP_QUERY, dateRange, xEntityFiscalCode, reKustoClient)
                 when (FdrKpiPeriod.valueOf(period)) {
                     FdrKpiPeriod.daily ->
                         dailyWpnfdrBuilder(
                             OffsetDateTime.of(dateRange.first.atStartOfDay(), ZoneOffset.UTC),
                             totalReports,
                             rows[0] as Int,
-                            typeEnum
+                            EntityTypeEnum.PSP
                         )
-                    FdrKpiPeriod.monthly -> monthlyWpnfdrBuilder(rows[0] as String, typeEnum)
+                    FdrKpiPeriod.monthly ->
+                        monthlyWpnfdrBuilder((rows[0] as Int).toString(), EntityTypeEnum.PSP)
                 }
             }
             else -> throw IllegalArgumentException("error")
