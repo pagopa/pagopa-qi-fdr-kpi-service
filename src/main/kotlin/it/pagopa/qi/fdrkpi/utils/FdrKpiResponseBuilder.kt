@@ -6,6 +6,11 @@ import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseAllOfDto.KpiNameE
 import java.net.URI
 import java.time.OffsetDateTime
 
+val KPI_DESCRIPTION_URI =
+    URI(
+        "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
+    )
+
 // --- lfdr
 fun dailyPspLfdrBuilder(
     paymentDate: OffsetDateTime,
@@ -20,10 +25,8 @@ fun dailyPspLfdrBuilder(
         "daily",
         lateFdrV1,
         lateFdrV2,
-        "FdR non rendicontati",
-        URI(
-            "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-        ),
+        "FdR in ritardo",
+        KPI_DESCRIPTION_URI,
         entityType,
         KpiNameEnum.LFDR
     )
@@ -38,10 +41,8 @@ fun monthlyLfdrBuilder(
         "monthly",
         kpiLfdrV1Value,
         kpiLfdrV2Value,
-        "FdR non rendicontati",
-        URI(
-            "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-        ),
+        "FdR in ritardo",
+        KPI_DESCRIPTION_URI,
         entityType,
         KpiNameEnum.LFDR
     )
@@ -63,9 +64,7 @@ fun dailyNrfdrBuilder(
         missingReports,
         foundReports,
         "FdR non rendicontati",
-        URI(
-            "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-        ),
+        KPI_DESCRIPTION_URI,
         entityType,
         KpiNameEnum.NRFDR
     )
@@ -76,9 +75,7 @@ fun monthlyNrfdrBuilder(kpiValue: String, entityType: EntityTypeEnum): MonthlyNR
         kpiValue,
         "monthly",
         "FdR non rendicontati",
-        URI(
-            "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-        ),
+        KPI_DESCRIPTION_URI,
         entityType,
         KpiNameEnum.NRFDR
     )
@@ -98,9 +95,7 @@ fun dailyWpnfdrBuilder(
         "daily",
         totalDiffNum,
         "FdR con numero di pagamenti errato",
-        URI(
-            "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-        ),
+        KPI_DESCRIPTION_URI,
         entityType,
         KpiNameEnum.WPNFDR
     )
@@ -111,9 +106,7 @@ fun monthlyWpnfdrBuilder(kpiValue: String, entityType: EntityTypeEnum): MonthlyW
         kpiValue,
         "monthly",
         "FdR con numero di pagamenti errato",
-        URI(
-            "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-        ),
+        KPI_DESCRIPTION_URI,
         entityType,
         KpiNameEnum.WPNFDR
     )
@@ -133,9 +126,7 @@ fun dailyWafdrBuilder(
         "daily",
         totalDiffNum,
         "FdR con importo errato",
-        URI(
-            "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-        ),
+        KPI_DESCRIPTION_URI,
         entityType,
         KpiNameEnum.WAFDR
     )
@@ -146,9 +137,7 @@ fun monthlyWafdrBuilder(kpiValue: String, entityType: EntityTypeEnum): MonthlyWP
         kpiValue,
         "monthly",
         "FdR con importo errato",
-        URI(
-            "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-        ),
+        KPI_DESCRIPTION_URI,
         entityType,
         KpiNameEnum.WAFDR
     )
