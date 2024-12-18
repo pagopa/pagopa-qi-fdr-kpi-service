@@ -2,12 +2,13 @@ package it.pagopa.qi.fdrkpi.controller.v1
 
 import it.pagopa.generated.qi.fdrkpi.v1.api.FdrKpiApi
 import it.pagopa.generated.qi.fdrkpi.v1.model.*
-import java.net.URI
+import it.pagopa.qi.fdrkpi.service.FdrKpiService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("FdrKpiV1Controller")
-class FdrKpiController : FdrKpiApi {
+class FdrKpiController(@Autowired private val fdrKpiService: FdrKpiService) : FdrKpiApi {
     /**
      * GET /fdr-kpi/{kpiType}/{period}
      *
@@ -27,23 +28,13 @@ class FdrKpiController : FdrKpiApi {
      */
     override fun calculateKpi(
         xEntityFiscalCode: String?,
-        kpiType: String?,
-        period: String?,
-        date: String?,
-        xPspCode: String?
+        kpiType: String,
+        period: String,
+        date: String,
+        xPspCode: String
     ): ResponseEntity<KPIResponseDto> {
         val response =
-            MonthlyLFDRMetricsDto(
-                "monthly",
-                "0.05",
-                "0.03",
-                "FdR in ritardo",
-                URI(
-                    "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
-                ),
-                KPIEntityResponseAllOfDto.EntityTypeEnum.PSP,
-                KPIEntityResponseAllOfDto.KpiNameEnum.LFDR
-            )
+            fdrKpiService.calculateKpi(xEntityFiscalCode, kpiType, period, date, xPspCode)
         return ResponseEntity.ok(response)
     }
 }
