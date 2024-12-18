@@ -75,7 +75,6 @@ dependencies {
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
   implementation("co.elastic.logging:logback-ecs-encoder:${Dependencies.ecsLoggingVersion}")
-  implementation("com.microsoft.azure.kusto:kusto-ingest:6.0.0")
   implementation("com.microsoft.azure.kusto:kusto-data:6.0.0")
   implementation("org.openapitools:jackson-databind-nullable:0.2.6")
   implementation("io.swagger.core.v3:swagger-annotations:2.2.8")
