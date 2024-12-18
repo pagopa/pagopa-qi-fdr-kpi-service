@@ -145,26 +145,26 @@ components:
               broker: '#/components/schemas/BrokerIdentifier'
 
     PSPIdentifier:
-     type: object
-     required:
-       - idPsp
-     properties:
-       idPsp:
-         type: string
-         example: "CIPBITMM"
+      type: object
+      required:
+        - idPsp
+      properties:
+        idPsp:
+          type: string
+          example: "CIPBITMM"
 
     BrokerIdentifier:
-     type: object
-     required:
-       - idBrokerPsp
-       - idPsp
-     properties:
-       idBrokerPsp:
-         type: string
-         example: "02654890025"
-       idPsp:
-         type: string
-         example: "CIPBITMM"
+      type: object
+      required:
+        - idBrokerPsp
+        - idPsp
+      properties:
+        idBrokerPsp:
+          type: string
+          example: "02654890025"
+        idPsp:
+          type: string
+          example: "CIPBITMM"
 
     DailyKPIBase:
       type: object
@@ -312,9 +312,6 @@ components:
       type: object
       discriminator:
         propertyName: responseType
-        mapping:
-          daily: '#/components/schemas/DailyKPIResponse'
-          monthly: '#/components/schemas/MonthlyKPIResponse'
       oneOf:
         - $ref: '#/components/schemas/DailyNRFDRMetrics'
         - $ref: '#/components/schemas/DailyLFDRMetrics'
