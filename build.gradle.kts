@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "it.pagopa.qi"
 
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1"
 
 description = "pagopa-qi-fdr-kpi-service"
 
@@ -34,7 +34,7 @@ configurations { compileOnly { extendsFrom(configurations.annotationProcessor.ge
 
 configurations {
   implementation.configure {
-    exclude(module = "spring-boot-starter-web")
+    exclude(module = "spring-boot-starter-webflux")
     exclude("org.apache.tomcat")
     exclude(group = "org.slf4j", module = "slf4j-simple")
   }
@@ -54,7 +54,7 @@ springBoot {
 
 tasks.named<Jar>("jar") { enabled = false }
 
-tasks.register("applySemanticVersionPlugin") {
+tasks.create("applySemanticVersionPlugin") {
   group = "semantic-versioning"
   description = "Semantic versioning plugin"
   dependsOn("prepareKotlinBuildScriptModel")
@@ -64,29 +64,23 @@ tasks.register("applySemanticVersionPlugin") {
 dependencyLocking { lockAllConfigurations() }
 
 dependencies {
+  implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-  implementation("io.projectreactor.netty:reactor-netty")
-  implementation("io.swagger.core.v3:swagger-annotations")
   implementation("jakarta.validation:jakarta.validation-api")
   implementation("jakarta.annotation:jakarta.annotation-api")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-  implementation("org.openapitools:jackson-databind-nullable")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-validation")
-  implementation("org.springframework.boot:spring-boot-starter-webflux")
-
   // Kotlin dependencies
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-  implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-
   implementation("co.elastic.logging:logback-ecs-encoder:${Dependencies.ecsLoggingVersion}")
+  implementation("com.microsoft.azure.kusto:kusto-data:6.0.0")
+  implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+  implementation("io.swagger.core.v3:swagger-annotations:2.2.8")
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
-  testImplementation("io.projectreactor:reactor-test")
   testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -112,8 +106,6 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     endWithNewline()
   }
 }
-
-dependencyLocking { lockAllConfigurations() }
 
 sourceSets {
   main {
@@ -148,7 +140,6 @@ tasks.register<org.openapitools.generator.gradle.plugin.tasks.GenerateTask>("fdr
       "hideGenerationTimestamp" to "true",
       "skipDefaultInterface" to "true",
       "useSwaggerUI" to "false",
-      "reactive" to "true",
       "useSpringBoot3" to "true",
       "useJakartaEe" to "true",
       "oas3" to "true",

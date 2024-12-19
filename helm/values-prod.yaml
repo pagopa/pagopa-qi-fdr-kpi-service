@@ -1,27 +1,45 @@
 microservice-chart:
   namespace: "qi"
   nameOverride: ""
-  fullnameOverride: "pagopa-qi-fdr-kpi-service"
+  fullnameOverride: ""
+  canaryDelivery:
+    create: false
+    ingress:
+      create: true
+      canary:
+        type: bluegreen
+    service:
+      create: true
+    deployment:
+      create: true
+      image:
+        repository: pagopapcommonacr.azurecr.io/pagopaqifdrkpiservice
+        tag: "latest"
+        pullPolicy: Always
+      envConfig: {}
   image:
-    repository: pagopadcommonacr.azurecr.io/pagopaqifdrkpiservice
+    repository: pagopapcommonacr.azurecr.io/pagopaqifdrkpiservice
     tag: "0.0.1"
     pullPolicy: Always
   livenessProbe:
+    handlerType: httpGet
     httpGet:
       path: /actuator/health/liveness
       port: 8080
-    initialDelaySeconds: 120
+    initialDelaySeconds: 60
     failureThreshold: 6
     periodSeconds: 10
   readinessProbe:
+    handlerType: httpGet
     httpGet:
       path: /actuator/health/readiness
       port: 8080
-    initialDelaySeconds: 120
+    initialDelaySeconds: 60
     failureThreshold: 6
     periodSeconds: 10
   deployment:
     create: true
+    replicas: 1
   service:
     create: true
     type: ClusterIP
@@ -29,7 +47,7 @@ microservice-chart:
       - 8080
   ingress:
     create: true
-    host: "weudev.qi.internal.dev.platform.pagopa.it"
+    host: "weuprod.qi.internal.platform.pagopa.it"
     path: /pagopa-qi-fdr-kpi-service/(.*)
     servicePort: 8080
   serviceAccount:
@@ -50,34 +68,39 @@ microservice-chart:
       memory: "256Mi"
       cpu: "150m"
   autoscaling:
-    enable: false
+    enable: true
     minReplica: 1
-    maxReplica: 1
-    pollingInterval: 10 # seconds
-    cooldownPeriod: 50 # seconds
+    maxReplica: 5
+    pollingInterval: 30 # seconds
+    cooldownPeriod: 30 # seconds
     triggers:
       - type: cpu
         metadata:
           # Required
           type: Utilization # Allowed types are 'Utilization' or 'AverageValue'
-          value: "75"
+          value: "70"
+    advanced:
+      horizontalPodAutoscalerConfig:
+        behavior:
+          scaleUp:
+            stabilizationWindowSeconds: 60
   envConfig:
     DEFAULT_LOGGING_LEVEL: "info"
     APP_LOGGING_LEVEL: "info"
     WEB_LOGGING_LEVEL: "info"
     ECS_SERVICE_NAME: "pagopa-qi-fdr-kpi-service"
     ECS_SERVICE_ENVIRONMENT: "dev"
-    OTEL_RESOURCE_ATTRIBUTES: "service.name=pagopa-qi-fdr-kpi-service,deployment.environment=dev"
+    OTEL_RESOURCE_ATTRIBUTES: "service.name=pagopa-qi-fdr-kpi-service,deployment.environment=prod"
     OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.elastic-system.svc:4317"
     OTEL_LOGS_EXPORTER: none
     OTEL_TRACES_SAMPLER: "always_on"
-    AZURE_DATA_EXPLORER_RE_ENDPOINT: "https://ingest-pagopaddataexplorer.westeurope.kusto.windows.net"
+    AZURE_DATA_EXPLORER_RE_ENDPOINT: "https://ingest-pagopapdataexplorer.westeurope.kusto.windows.net"
     AZURE_DATA_EXPLORER_RE_APPLICATION_TENANT_ID: "7788edaf-0346-4068-9d79-c868aed15b3d"
   envSecret:
     AZURE_DATA_EXPLORER_RE_CLIENT_ID: azure-data-explorer-re-client-id
     AZURE_DATA_EXPLORER_RE_APPLICATION_KEY: azure-data-explorer-re-application-key
   keyvault:
-    name: "pagopa-d-qi-kv"
+    name: "pagopa-p-qi-kv"
     tenantId: "7788edaf-0346-4068-9d79-c868aed15b3d"
   nodeSelector: {}
   tolerations: []
@@ -90,7 +113,3 @@ microservice-chart:
                 operator: In
                 values:
                   - user
-  canaryDelivery:
-    deployment:
-      image:
-        tag: ""
