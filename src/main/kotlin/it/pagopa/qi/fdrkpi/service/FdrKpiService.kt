@@ -31,7 +31,8 @@ class FdrKpiService(
         period: String,
         date: String
     ): KPIResponseDto {
-        val dateRange: Pair<LocalDate, LocalDate> = getDateRange(period, date)
+        val dateRange: Pair<LocalDate, LocalDate> =
+            getDateRange(period, date) // TODO manage exception cases
         var totalReports = 0
 
         if (FdrKpiPeriod.daily == FdrKpiPeriod.valueOf(period)) {
@@ -103,7 +104,7 @@ class FdrKpiService(
                         monthlyWpnfdrBuilder((rows[0] as Int).toString(), EntityTypeEnum.PSP)
                 }
             }
-            else -> throw IllegalArgumentException("error")
+            else -> throw IllegalArgumentException("error") // TODO
         }
     }
 
@@ -120,6 +121,6 @@ class FdrKpiService(
         while (primaryResult.next()) {
             return primaryResult.currentRow
         }
-        throw IllegalArgumentException("error")
+        throw IllegalArgumentException("error") // TODO
     }
 }
