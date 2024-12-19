@@ -30,11 +30,6 @@
         "header": [
           {
             "key": "x-entity-fiscal-code",
-            "value": "{{X-ENTITY-FISCAL-CODE}}",
-            "type": "text"
-          },
-          {
-            "key": "x-psp-code",
             "value": "{{X-PSP-CODE}}",
             "type": "text"
           },
@@ -91,11 +86,6 @@
         "header": [
           {
             "key": "x-entity-fiscal-code",
-            "value": "{{X-ENTITY-FISCAL-CODE-NOT-FOUND}}",
-            "type": "text"
-          },
-          {
-            "key": "x-psp-code",
             "value": "{{X-PSP-CODE-NOT-FOUND}}",
             "type": "text"
           },
@@ -151,7 +141,7 @@
         "header": [
           {
             "key": "x-entity-fiscal-code",
-            "value": "{{X-ENTITY-FISCAL-CODE}}",
+            "value": "{{X-PSP-CODE}}",
             "type": "text"
           },
           {
@@ -206,7 +196,7 @@
         "header": [
           {
             "key": "x-entity-fiscal-code",
-            "value": "{{X-ENTITY-FISCAL-CODE}}",
+            "value": "{{X-PSP-CODE}}",
             "type": "text"
           },
           {
@@ -262,7 +252,7 @@
         "header": [
           {
             "key": "x-entity-fiscal-code",
-            "value": "{{X-ENTITY-FISCAL-CODE}}",
+            "value": "{{X-PSP-CODE}}",
             "type": "text"
           },
           {
@@ -317,7 +307,7 @@
         "header": [
           {
             "key": "x-entity-fiscal-code",
-            "value": "{{X-ENTITY-FISCAL-CODE}}",
+            "value": "{{X-PSP-CODE}}",
             "type": "text"
           },
           {
