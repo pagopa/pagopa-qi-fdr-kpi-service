@@ -14,15 +14,15 @@ tags:
     description: Api's for performing KPI calculation
 
 paths:
-  /fdr-kpi/{kpiType}/{period}:
+  /fdr-kpi/{kpiType}:
     get:
       tags:
         - qiFdr
       operationId: calculateKpi
       parameters:
-        - name: x-entity-fiscal-code
-          in: header
-          required: true
+        - name: brokerFiscalCode
+          in: query
+          required: false
           schema:
             type: string
             example: "02654890025"
@@ -31,8 +31,8 @@ paths:
             - For direct PSP queries: use PSP fiscal code
             - For broker queries: use broker fiscal code
 
-        - name: x-psp-code
-          in: header
+        - name: pspId
+          in: query
           required: false
           schema:
             type: string
@@ -52,7 +52,7 @@ paths:
             The type of KPI to calculate
 
         - name: period
-          in: path
+          in: query
           required: true
           schema:
             type: string
