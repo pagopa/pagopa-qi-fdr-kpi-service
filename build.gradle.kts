@@ -70,6 +70,7 @@ dependencies {
   implementation("jakarta.annotation:jakarta.annotation-api")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-validation")
+  implementation("com.diffplug.spotless:spotless-plugin-gradle:6.18.0")
   // Kotlin dependencies
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
