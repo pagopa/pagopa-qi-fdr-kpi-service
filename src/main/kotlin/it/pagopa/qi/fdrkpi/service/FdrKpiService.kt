@@ -75,13 +75,14 @@ class FdrKpiService(
             }
             KpiNameEnum.valueOf(kpiType) == KpiNameEnum.NRFDR -> {
                 val rows = executeQuery(NRFDR_PSP_QUERY, dateRange, xEntityFiscalCode)
+                val missingReports = rows[0] as Int
                 when (FdrKpiPeriod.valueOf(period)) {
                     FdrKpiPeriod.daily ->
                         dailyNrfdrBuilder(
                             OffsetDateTime.of(dateRange.first.atStartOfDay(), ZoneOffset.UTC),
                             totalReports,
                             rows[0] as Int,
-                            0, // TODO
+                            totalReports - missingReports,
                             EntityTypeEnum.PSP
                         )
                     FdrKpiPeriod.monthly ->
