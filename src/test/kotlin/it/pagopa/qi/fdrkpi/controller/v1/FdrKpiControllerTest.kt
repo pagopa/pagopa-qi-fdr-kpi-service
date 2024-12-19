@@ -2,6 +2,7 @@ package it.pagopa.qi.fdrkpi.controller.v1
 
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 
 /**
@@ -14,7 +15,7 @@ class FdrKpiControllerTest {
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        fdrKpiController = FdrKpiController()
+        fdrKpiController = FdrKpiController(mock())
     }
 
     @Test
@@ -41,11 +42,11 @@ class FdrKpiControllerTest {
 
         val result =
             fdrKpiController.calculateKpi(
-                xEntityFiscalCode = null,
-                kpiType = null,
-                period = null,
-                date = null,
-                xPspCode = null,
+                xEntityFiscalCode = "",
+                kpiType = "",
+                period = "",
+                date = "",
+                xPspCode = "",
             )
     }
 }

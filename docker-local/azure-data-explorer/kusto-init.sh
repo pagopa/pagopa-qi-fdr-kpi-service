@@ -53,7 +53,7 @@ while true; do
             --header 'Content-Type: application/json' \
             --data '{
                 "db": "NetDefaultDB",
-                "csl": ".ingest inline into table KPI_RENDICONTAZIONI <| 2023-10-01T00:00:00Z, 01153230360, SARDIT31, 3, 0, 3, 0, 0, 0, 0"
+                "csl": ".ingest inline into table KPI_RENDICONTAZIONI <| 2023-10-01T00:00:00Z, 01153230360,SARDIT31,3,0,3,0,0,0,0"
             }'
             echo "KPI_RENDICONTAZIONI table populated"
 
@@ -70,7 +70,7 @@ while true; do
             --header 'Content-Type: application/json' \
             --data '{
                 "db": "NetDefaultDB",
-                "csl": ".ingest inline into table KPI_RENDICONTAZIONI_DETAILS <| 2023-11-08T14:00:00.021359Z, 111362066159717101, 11362066159717101, 03436fab0316458a8eaa1db37df9f4c7, 00488410010, 00488410010, 11.15, IT62Q0200809440000030043534, 1, 1, 0, PPAYITR1XXX, 06874351007, 2, 2023-11-09PPAYITR1XXX-S4004739269, 202"
+                "csl": ".ingest inline into table KPI_RENDICONTAZIONI_DETAILS <| 2023-11-08T14:00:00.021359Z,111362066159717101,11362066159717101,03436fab0316458a8eaa1db37df9f4c7,00488410010,00488410010,11.15,IT62Q0200809440000030043534,1,1,0,PPAYITR1XXX,06874351007,2,2023-11-09PPAYITR1XXX-S4004739269,202"
             }'
             echo "KPI_RENDICONTAZIONI_DETAILS table populated"
             echo "Kusto DB initialization completed"
