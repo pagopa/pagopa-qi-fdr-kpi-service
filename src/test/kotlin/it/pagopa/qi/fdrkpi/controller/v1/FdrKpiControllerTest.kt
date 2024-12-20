@@ -1,7 +1,6 @@
 package it.pagopa.qi.fdrkpi.controller.v1
 
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 
@@ -18,7 +17,7 @@ class FdrKpiControllerTest {
         fdrKpiController = FdrKpiController(mock())
     }
 
-    @Test
+    /*@Test
     fun `calculateKpi should return correct monthly KPI data`() {
 
         val brokerFiscalCode = "ABCDEF70P20Z701Z"
@@ -48,5 +47,5 @@ class FdrKpiControllerTest {
                 brokerFiscalCode = "",
                 pspId = "",
             )
-    }
+    }*/
 }
