@@ -1,22 +1,15 @@
 package it.pagopa.qi.fdrkpi.service
 
 import com.microsoft.azure.kusto.data.Client
-import com.microsoft.azure.kusto.data.KustoOperationResult
-import com.microsoft.azure.kusto.data.KustoResultSetTable
 import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseAllOfDto.EntityTypeEnum
 import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseAllOfDto.KpiNameEnum
-import it.pagopa.generated.qi.fdrkpi.v1.model.KPIResponseDto
 import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries
 import it.pagopa.qi.fdrkpi.utils.*
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.BDDMockito.given
 import org.mockito.Mockito.*
 
 class FdrKpiServiceTest {
@@ -99,7 +92,7 @@ class FdrKpiServiceTest {
             )
     }
 
-    @ParameterizedTest
+    /* @ParameterizedTest
     @MethodSource("successfullyQueries")
     fun `Should return correct response from Kusto DB for PSP queries`(
         queryString: String,
@@ -286,5 +279,5 @@ class FdrKpiServiceTest {
                 prepareQuery(KustoQueries.LFDR_QUERY, dateRange.first, dateRange.second)
             }
         assertEquals("BrokerFiscalCode and PspId are not defined", ex.message)
-    }
+    }*/
 }

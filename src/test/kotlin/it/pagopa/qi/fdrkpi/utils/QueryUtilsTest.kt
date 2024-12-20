@@ -11,17 +11,19 @@ import org.junit.jupiter.api.assertThrows
 
 class QueryUtilsTest {
     @Test
-    fun `test preparePspQuery replaces placeholders correctly`() {
+    fun `test prepareQuery replaces placeholders correctly`() {
         val query =
-            "SELECT * FROM table WHERE start_date = '\$START_DATE' AND end_date = '\$END_DATE' AND psp = '\$PSP'"
+            "SELECT * FROM table \$FILTER | where GIORNATA_PAGAMENTO between (datetime(\$START_DATE) .. datetime(\$END_DATE))"
         val startDate = LocalDate.of(2024, 1, 1)
         val endDate = LocalDate.of(2024, 1, 31)
-        val psp = "PSP123"
+        val pspId = "PSP123"
+        val brokerFiscalCode = "01234556789" // Usato come brokerId
 
-        val result = preparePspQuery(query, startDate, endDate, psp)
+
+        val result = prepareQuery(query, startDate, endDate, brokerFiscalCode, pspId)
 
         val expected =
-            "SELECT * FROM table WHERE start_date = '2024-01-01' AND end_date = '2024-01-31' AND psp = 'PSP123'"
+            "SELECT * FROM table | where ID_PSP == \"PSP123\" and ID_BROKER_PSP == 01234556789 | where GIORNATA_PAGAMENTO between (datetime(2024-01-01) .. datetime(2024-01-31))"
         assertEquals(expected, result)
     }
 

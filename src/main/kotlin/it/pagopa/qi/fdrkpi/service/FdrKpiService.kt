@@ -162,7 +162,7 @@ class FdrKpiService(
             prepareQuery(query, dateRange.first, dateRange.second, brokerFiscalCode, pspId)
         logger.debug("Executing query: $preparedQuery")
         return try {
-            val result = reKustoClient.executeQuery("re", preparedQuery)
+            val result = reKustoClient.executeQuery(preparedQuery)
             if (!result.primaryResults.next()) {
                 throw NoResultsFoundException(pspId)
             }

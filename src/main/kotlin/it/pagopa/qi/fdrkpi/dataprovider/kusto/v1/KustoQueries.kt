@@ -47,7 +47,7 @@ object KustoQueries {
         ${'$'}FILTER
         | summarize TOTALE_FLUSSI=sum(TOTALE_FLUSSI),
                     FDR_IN_RITARDO_F=sum(FDR_IN_RITARDO_FIRST_VERSION),
-                    FDR_IN_RITARDO_L=sum(FDR_IN_RITARDO_LAST_VERSION)
+                    FDR_IN_RITARDO_L=sum(FDR_IN_RITARDO_LAST_VERSION),
                     TOT_COUNT = count()
         | extend PERC_FLUSSI_RITARDO_v1 = iff(TOT_COUNT == 0, -1, iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (FDR_IN_RITARDO_F * 100) / TOTALE_FLUSSI))
         | extend PERC_FLUSSI_RITARDO_v2 = iff(TOT_COUNT == 0, -1, iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (FDR_IN_RITARDO_L * 100) / TOTALE_FLUSSI))
@@ -65,7 +65,7 @@ object KustoQueries {
         ${'$'}FILTER
         | summarize TOTALE_FLUSSI=sum(TOTALE_FLUSSI),
                     FDR_ASSENTI=sum(FLUSSI_ASSENTI),
-                    FDR_PRESENTI=sum(FLUSSI_PRESENTI)
+                    FDR_PRESENTI=sum(FLUSSI_PRESENTI),
                     TOT_COUNT = count()
         by ID_PSP
         | extend PERC_FLUSSI_ASSENTI = iff(TOT_COUNT == 0, -1, iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (FDR_ASSENTI * 100) / TOTALE_FLUSSI))
@@ -84,7 +84,7 @@ object KustoQueries {
         | where GIORNATA_PAGAMENTO between (start .. end)
         ${'$'}FILTER
         | summarize TOTALE_FLUSSI=sum(TOTALE_FLUSSI),
-                    TOTALE_DIFF_NUM=sum(TOTALE_DIFF_NUM)
+                    TOTALE_DIFF_NUM=sum(TOTALE_DIFF_NUM),
                     TOT_COUNT = count()
         | extend PERC_DIFF_NUM = iff(TOT_COUNT == 0, -1, iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (TOTALE_DIFF_NUM * 100) / TOTALE_FLUSSI))
         | project PERC_DIFF_NUM
@@ -100,7 +100,7 @@ object KustoQueries {
         | where GIORNATA_PAGAMENTO between (start .. end)
         ${'$'}FILTER
         | summarize TOTALE_FLUSSI=sum(TOTALE_FLUSSI),
-                    TOTALE_DIFF_AMOUNT=sum(TOTALE_DIFF_AMOUNT)
+                    TOTALE_DIFF_AMOUNT=sum(TOTALE_DIFF_AMOUNT),
                     TOT_COUNT = count()
         | extend PERC_DIFF_AMOUNT = iff(TOT_COUNT == 0, -1, iff(TOTALE_FLUSSI == 0 or isnull(TOTALE_FLUSSI), 0, (TOTALE_DIFF_AMOUNT * 100) / TOTALE_FLUSSI)) 
         | project PERC_DIFF_AMOUNT
