@@ -127,7 +127,7 @@ class FdrKpiServiceTest {
             given(totalReportsResultSetTable.currentRow).willReturn(listOf(totalReports))
             given(totalReportsCountKustoResp.primaryResults).willReturn(totalReportsResultSetTable)
             given(totalReportsResultSetTable.next()).willReturn(true)
-            given(reKustoClient.executeQuery(eq(queryTotalReports)))
+            given(reKustoClient.executeQuery(any(), eq(queryTotalReports)))
                 .willReturn(totalReportsCountKustoResp)
         }
 
@@ -138,7 +138,7 @@ class FdrKpiServiceTest {
         given(queryResultSetTable.currentRow).willReturn(queryResponse)
         given(queryKustoResp.primaryResults).willReturn(queryResultSetTable)
         given(queryResultSetTable.next()).willReturn(true)
-        given(reKustoClient.executeQuery(eq(queryKusto))).willReturn(queryKustoResp)
+        given(reKustoClient.executeQuery(any(), eq(queryKusto))).willReturn(queryKustoResp)
 
         val response =
             fdrKpiService.calculateKpi(
@@ -160,7 +160,7 @@ class FdrKpiServiceTest {
         val queryResultSetTable = mock(KustoResultSetTable::class.java)
         given(queryKustoResp.primaryResults).willReturn(queryResultSetTable)
         given(queryResultSetTable.next()).willReturn(false)
-        given(reKustoClient.executeQuery(any())).willReturn(queryKustoResp)
+        given(reKustoClient.executeQuery(any(), any())).willReturn(queryKustoResp)
 
         val ex =
             org.junit.jupiter.api.assertThrows<IllegalArgumentException> {

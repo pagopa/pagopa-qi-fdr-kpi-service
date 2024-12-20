@@ -115,7 +115,8 @@ class FdrKpiService(
         xPspCode: String
     ): List<Any> {
         val result =
-            reKustoClient.executeQuery("re",
+            reKustoClient.executeQuery(
+                "re",
                 preparePspQuery(query, dateRange.first, dateRange.second, xPspCode)
             )
         val primaryResult = result.primaryResults
