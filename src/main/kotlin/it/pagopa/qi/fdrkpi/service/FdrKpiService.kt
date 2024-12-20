@@ -29,7 +29,7 @@ class FdrKpiService(
         kpiType: String,
         period: String,
         date: String,
-        xEntityFiscalCode: String?,
+        brokerFiscalCode: String?,
         pspId: String?,
     ): KPIResponseDto {
         val dateRange: Pair<LocalDate, LocalDate> =
