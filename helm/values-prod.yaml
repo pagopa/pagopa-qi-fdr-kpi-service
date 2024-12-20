@@ -94,7 +94,7 @@ microservice-chart:
     OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.elastic-system.svc:4317"
     OTEL_LOGS_EXPORTER: none
     OTEL_TRACES_SAMPLER: "always_on"
-    AZURE_DATA_EXPLORER_RE_ENDPOINT: "https://ingest-pagopapdataexplorer.westeurope.kusto.windows.net"
+    AZURE_DATA_EXPLORER_RE_ENDPOINT: "https://pagopapdataexplorer.westeurope.kusto.windows.net"
     AZURE_DATA_EXPLORER_RE_APPLICATION_TENANT_ID: "7788edaf-0346-4068-9d79-c868aed15b3d"
   envSecret:
     AZURE_DATA_EXPLORER_RE_CLIENT_ID: azure-data-explorer-re-client-id
