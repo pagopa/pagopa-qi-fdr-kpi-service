@@ -5,7 +5,7 @@
   },
   "item": [
     {
-      "name": "Calculate Monthly KPI - Success",
+      "name": "Calculate Monthly KPI - Success (Direct PSP)",
       "event": [
         {
           "listen": "test",
@@ -29,10 +29,67 @@
         "method": "GET",
         "header": [
           {
-            "key": "x-entity-fiscal-code",
-            "value": "{{X-PSP-CODE}}",
+            "key": "Ocp-Apim-Subscription-Key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
           },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}?pspId={{PSP_ID}}&period={{PERIOD_MONTHLY}}&date={{DATE}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "qi",
+            "fdr-kpi-service",
+            "v1",
+            "fdr-kpi",
+            "{{KPI_TYPE}}"
+          ],
+          "query": [
+            {
+              "key": "pspId",
+              "value": "{{PSP_ID}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_MONTHLY}}"
+            },
+            {
+              "key": "date",
+              "value": "{{DATE}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Calculate Monthly KPI - Success (Broker)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Calculate Monthly KPI - Success Response\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('responseType').to.equal('monthly');",
+              "    pm.expect(response).to.have.property('brokerFiscalCode');",
+              "    pm.expect(response).to.have.property('kpiName');",
+              "    pm.expect(response).to.have.property('kpiDescription');",
+              "    pm.expect(response).to.have.property('kpiDescriptionUrl');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
           {
             "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
@@ -45,25 +102,98 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}/{{PERIOD}}?date={{DATE}}",
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}?brokerFiscalCode={{BROKER_FISCAL_CODE}}&period={{PERIOD_MONTHLY}}&date={{DATE}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "qi",
             "fdr-kpi-service",
             "v1",
             "fdr-kpi",
-            "{{KPI_TYPE}}",
-            "{{PERIOD}}"
+            "{{KPI_TYPE}}"
           ],
           "query": [
+            {
+              "key": "brokerFiscalCode",
+              "value": "{{BROKER_FISCAL_CODE}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_MONTHLY}}"
+            },
             {
               "key": "date",
               "value": "{{DATE}}"
             }
           ]
         }
-      },
-      "response": []
+      }
+    },
+    {
+      "name": "Calculate Monthly KPI - Success (Broker & PSP)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Calculate Monthly KPI - Success Response\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('responseType').to.equal('monthly');",
+              "    pm.expect(response).to.have.property('brokerFiscalCode');",
+              "    pm.expect(response).to.have.property('pspId');",
+              "    pm.expect(response).to.have.property('kpiName');",
+              "    pm.expect(response).to.have.property('kpiDescription');",
+              "    pm.expect(response).to.have.property('kpiDescriptionUrl');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Ocp-Apim-Subscription-Key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}?brokerFiscalCode={{BROKER_FISCAL_CODE}}&pspId={{PSP_ID}}&period={{PERIOD_MONTHLY}}&date={{DATE}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "qi",
+            "fdr-kpi-service",
+            "v1",
+            "fdr-kpi",
+            "{{KPI_TYPE}}"
+          ],
+          "query": [
+            {
+              "key": "brokerFiscalCode",
+              "value": "{{BROKER_FISCAL_CODE}}"
+            },
+            {
+              "key": "pspId",
+              "value": "{{PSP_ID}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_MONTHLY}}"
+            },
+            {
+              "key": "date",
+              "value": "{{DATE}}"
+            }
+          ]
+        }
+      }
     },
     {
       "name": "Calculate KPI - PSP Not Found",
@@ -88,11 +218,6 @@
         "method": "GET",
         "header": [
           {
-            "key": "x-entity-fiscal-code",
-            "value": "{{X-PSP-CODE-NOT-FOUND}}",
-            "type": "text"
-          },
-          {
             "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
@@ -104,17 +229,24 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}/{{PERIOD}}?date={{DATE}}",
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}?pspId={{PSP_ID_NOT_FOUND}}&period={{PERIOD_MONTHLY}}&date={{DATE}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "qi",
             "fdr-kpi-service",
             "v1",
             "fdr-kpi",
-            "{{KPI_TYPE}}",
-            "{{PERIOD}}"
+            "{{KPI_TYPE}}"
           ],
           "query": [
+            {
+              "key": "pspId",
+              "value": "{{PSP_ID_NOT_FOUND}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_MONTHLY}}"
+            },
             {
               "key": "date",
               "value": "{{DATE}}"
@@ -146,11 +278,6 @@
         "method": "GET",
         "header": [
           {
-            "key": "x-entity-fiscal-code",
-            "value": "{{X-PSP-CODE}}",
-            "type": "text"
-          },
-          {
             "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
@@ -162,17 +289,24 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE_NOT_VALID}}/{{PERIOD}}?date={{DATE}}",
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE_NOT_VALID}}?pspId={{PSP_ID}}&period={{PERIOD_MONTHLY}}&date={{DATE}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "qi",
             "fdr-kpi-service",
             "v1",
             "fdr-kpi",
-            "{{KPI_TYPE_NOT_VALID}}",
-            "{{PERIOD}}"
+            "{{KPI_TYPE_NOT_VALID}}"
           ],
           "query": [
+            {
+              "key": "pspId",
+              "value": "{{PSP_ID}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_MONTHLY}}"
+            },
             {
               "key": "date",
               "value": "{{DATE}}"
@@ -204,11 +338,6 @@
         "method": "GET",
         "header": [
           {
-            "key": "x-entity-fiscal-code",
-            "value": "{{X-PSP-CODE}}",
-            "type": "text"
-          },
-          {
             "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
@@ -220,17 +349,24 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}/{{PERIOD_NOT_VALID}}?date={{DATE}}",
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}?pspId={{PSP_ID}}&period={{PERIOD_NOT_VALID}}&date={{DATE}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "qi",
             "fdr-kpi-service",
             "v1",
             "fdr-kpi",
-            "{{KPI_TYPE}}",
-            "{{PERIOD_NOT_VALID}}"
+            "{{KPI_TYPE}}"
           ],
           "query": [
+            {
+              "key": "pspId",
+              "value": "{{PSP_ID}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_NOT_VALID}}"
+            },
             {
               "key": "date",
               "value": "{{DATE}}"
@@ -263,11 +399,6 @@
         "method": "GET",
         "header": [
           {
-            "key": "x-entity-fiscal-code",
-            "value": "{{X-PSP-CODE}}",
-            "type": "text"
-          },
-          {
             "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
@@ -279,17 +410,24 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}/{{PERIOD}}?date={{DATE_TOO_RECENT}}",
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}?pspId={{PSP_ID}}&period={{PERIOD_DAILY}}&date={{DATE_TOO_RECENT}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "qi",
             "fdr-kpi-service",
             "v1",
             "fdr-kpi",
-            "{{KPI_TYPE}}",
-            "{{PERIOD}}"
+            "{{KPI_TYPE}}"
           ],
           "query": [
+            {
+              "key": "pspId",
+              "value": "{{PSP_ID}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_DAILY}}"
+            },
             {
               "key": "date",
               "value": "{{DATE_TOO_RECENT}}"
@@ -321,11 +459,6 @@
         "method": "GET",
         "header": [
           {
-            "key": "x-entity-fiscal-code",
-            "value": "{{X-PSP-CODE}}",
-            "type": "text"
-          },
-          {
             "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
@@ -337,17 +470,24 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}/{{PERIOD}}?date={{DATE_NOT_VALID}}",
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}?pspId={{PSP_ID}}&period={{PERIOD_MONTHLY}}&date={{DATE_NOT_VALID}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "qi",
             "fdr-kpi-service",
             "v1",
             "fdr-kpi",
-            "{{KPI_TYPE}}",
-            "{{PERIOD}}"
+            "{{KPI_TYPE}}"
           ],
           "query": [
+            {
+              "key": "pspId",
+              "value": "{{PSP_ID}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_MONTHLY}}"
+            },
             {
               "key": "date",
               "value": "{{DATE_NOT_VALID}}"
