@@ -23,7 +23,8 @@ class FdrKpiServiceTest {
 
     private val reKustoClient: Client = mock(Client::class.java)
     private val fdrKpiService: FdrKpiService = FdrKpiService(reKustoClient)
-    private val xEntityFiscalCode = "SARDIT31"
+    private val brokerFiscalCode = "02654890025"
+    private val pspID = "SARDIT31"
 
     companion object {
         private val date: OffsetDateTime =
@@ -119,33 +120,33 @@ class FdrKpiServiceTest {
                     KustoQueries.TOTAL_FLOWS_QUERY,
                     dateRange.first,
                     dateRange.second,
-                    xEntityFiscalCode
+                    pspID
                 )
             val totalReportsCountKustoResp = mock(KustoOperationResult::class.java)
             val totalReportsResultSetTable = mock(KustoResultSetTable::class.java)
             given(totalReportsResultSetTable.currentRow).willReturn(listOf(totalReports))
             given(totalReportsCountKustoResp.primaryResults).willReturn(totalReportsResultSetTable)
             given(totalReportsResultSetTable.next()).willReturn(true)
-            given(reKustoClient.executeQuery(eq(queryTotalReports)))
+            given(reKustoClient.executeQuery(any(), eq(queryTotalReports)))
                 .willReturn(totalReportsCountKustoResp)
         }
 
         // Query Kusto mock
-        val queryKusto =
-            preparePspQuery(queryString, dateRange.first, dateRange.second, xEntityFiscalCode)
+        val queryKusto = preparePspQuery(queryString, dateRange.first, dateRange.second, pspID)
         val queryKustoResp = mock(KustoOperationResult::class.java)
         val queryResultSetTable = mock(KustoResultSetTable::class.java)
         given(queryResultSetTable.currentRow).willReturn(queryResponse)
         given(queryKustoResp.primaryResults).willReturn(queryResultSetTable)
         given(queryResultSetTable.next()).willReturn(true)
-        given(reKustoClient.executeQuery(eq(queryKusto))).willReturn(queryKustoResp)
+        given(reKustoClient.executeQuery(any(), eq(queryKusto))).willReturn(queryKustoResp)
 
         val response =
             fdrKpiService.calculateKpi(
-                xEntityFiscalCode,
                 kpiNameEnum.name,
                 fdrKpiPeriod.name,
-                dateString
+                dateString,
+                brokerFiscalCode,
+                pspID
             )
         assertEquals(expectedResponse, response)
     }
@@ -159,15 +160,16 @@ class FdrKpiServiceTest {
         val queryResultSetTable = mock(KustoResultSetTable::class.java)
         given(queryKustoResp.primaryResults).willReturn(queryResultSetTable)
         given(queryResultSetTable.next()).willReturn(false)
-        given(reKustoClient.executeQuery(any())).willReturn(queryKustoResp)
+        given(reKustoClient.executeQuery(any(), any())).willReturn(queryKustoResp)
 
         val ex =
             org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
                 fdrKpiService.calculateKpi(
-                    xEntityFiscalCode,
                     KpiNameEnum.LFDR.name,
                     FdrKpiPeriod.monthly.name,
-                    dateString
+                    dateString,
+                    brokerFiscalCode,
+                    pspID
                 )
             }
         assertEquals("error", ex.message)

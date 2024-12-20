@@ -21,19 +21,19 @@ class FdrKpiControllerTest {
     @Test
     fun `calculateKpi should return correct monthly KPI data`() {
 
-        val xEntityFiscalCode = "ABCDEF70P20Z701Z"
+        val brokerFiscalCode = "ABCDEF70P20Z701Z"
         val kpiType = "kpiType"
         val period = "202409"
         val date = "2024-09-15"
-        val xPspCode = "CIPBITMM"
+        val pspId = "CIPBITMM"
 
         val result =
             fdrKpiController.calculateKpi(
-                xEntityFiscalCode = xEntityFiscalCode,
                 kpiType = kpiType,
                 period = period,
                 date = date,
-                xPspCode = xPspCode,
+                brokerFiscalCode = brokerFiscalCode,
+                pspId = pspId,
             )
     }
 
@@ -42,11 +42,11 @@ class FdrKpiControllerTest {
 
         val result =
             fdrKpiController.calculateKpi(
-                xEntityFiscalCode = "",
                 kpiType = "",
                 period = "",
                 date = "",
-                xPspCode = "",
+                brokerFiscalCode = "",
+                pspId = "",
             )
     }
 }
