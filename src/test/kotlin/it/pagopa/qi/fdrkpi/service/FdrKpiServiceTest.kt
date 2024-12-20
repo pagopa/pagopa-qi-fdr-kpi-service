@@ -23,7 +23,8 @@ class FdrKpiServiceTest {
 
     private val reKustoClient: Client = mock(Client::class.java)
     private val fdrKpiService: FdrKpiService = FdrKpiService(reKustoClient)
-    private val xEntityFiscalCode = "SARDIT31"
+    private val brokerFiscalCode = "02654890025"
+    private val pspID = "SARDIT31"
 
     companion object {
         private val date: OffsetDateTime =
@@ -119,7 +120,7 @@ class FdrKpiServiceTest {
                     KustoQueries.TOTAL_FLOWS_QUERY,
                     dateRange.first,
                     dateRange.second,
-                    xEntityFiscalCode
+                    pspID
                 )
             val totalReportsCountKustoResp = mock(KustoOperationResult::class.java)
             val totalReportsResultSetTable = mock(KustoResultSetTable::class.java)
@@ -131,8 +132,7 @@ class FdrKpiServiceTest {
         }
 
         // Query Kusto mock
-        val queryKusto =
-            preparePspQuery(queryString, dateRange.first, dateRange.second, xEntityFiscalCode)
+        val queryKusto = preparePspQuery(queryString, dateRange.first, dateRange.second, pspID)
         val queryKustoResp = mock(KustoOperationResult::class.java)
         val queryResultSetTable = mock(KustoResultSetTable::class.java)
         given(queryResultSetTable.currentRow).willReturn(queryResponse)
@@ -142,10 +142,11 @@ class FdrKpiServiceTest {
 
         val response =
             fdrKpiService.calculateKpi(
-                xEntityFiscalCode,
                 kpiNameEnum.name,
                 fdrKpiPeriod.name,
-                dateString
+                dateString,
+                brokerFiscalCode,
+                pspID
             )
         assertEquals(expectedResponse, response)
     }
@@ -164,10 +165,11 @@ class FdrKpiServiceTest {
         val ex =
             org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
                 fdrKpiService.calculateKpi(
-                    xEntityFiscalCode,
                     KpiNameEnum.LFDR.name,
                     FdrKpiPeriod.monthly.name,
-                    dateString
+                    dateString,
+                    brokerFiscalCode,
+                    pspID
                 )
             }
         assertEquals("error", ex.message)
