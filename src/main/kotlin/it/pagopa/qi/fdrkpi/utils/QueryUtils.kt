@@ -4,7 +4,7 @@ import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.generateIdFilter
 import java.time.LocalDate
 import java.time.YearMonth
 
-fun preparePspQuery(
+fun prepareQuery(
     query: String,
     startDate: LocalDate,
     endDate: LocalDate,

@@ -119,7 +119,7 @@ class FdrKpiService(
         val result =
             reKustoClient.executeQuery(
                 "re", // TODO
-                preparePspQuery(query, dateRange.first, dateRange.second, brokerFiscalCode, pspId)
+                prepareQuery(query, dateRange.first, dateRange.second, brokerFiscalCode, pspId)
             )
         val primaryResult = result.primaryResults
         while (primaryResult.next()) {

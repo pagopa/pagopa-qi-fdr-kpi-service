@@ -26,7 +26,7 @@ object KustoQueries {
                 "| where ID_PSP == \"$pspId\" and ID_BROKER_PSP == $brokerId"
             pspId != null -> "| where ID_PSP == \"$pspId\""
             brokerId != null -> "| where ID_BROKER_PSP == $brokerId"
-            else -> throw RuntimeException("Broker ID is not defined")
+            else -> throw RuntimeException("BrokerFiscalCode and PspId are not defined")
         }
     }
 
