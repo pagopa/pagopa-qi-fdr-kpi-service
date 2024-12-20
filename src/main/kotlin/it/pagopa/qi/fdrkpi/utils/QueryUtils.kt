@@ -1,8 +1,8 @@
 package it.pagopa.qi.fdrkpi.utils
 
+import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.generateIdFilter
 import it.pagopa.qi.fdrkpi.exceptionhandler.DateTooRecentException
 import it.pagopa.qi.fdrkpi.exceptionhandler.InvalidPeriodException
-import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.generateIdFilter
 import java.time.LocalDate
 import java.time.YearMonth
 

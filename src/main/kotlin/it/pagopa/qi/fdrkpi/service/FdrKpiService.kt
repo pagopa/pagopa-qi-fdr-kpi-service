@@ -15,7 +15,6 @@ import it.pagopa.qi.fdrkpi.exceptionhandler.NoResultsFoundException
 import it.pagopa.qi.fdrkpi.exceptionhandler.PspNotFoundException
 import it.pagopa.qi.fdrkpi.utils.*
 import java.time.LocalDate
-import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -34,7 +33,7 @@ class FdrKpiService(
         period: String,
         date: String,
         brokerFiscalCode: String?,
-        pspId: String?,
+        pspId: String?
     ): KPIResponseDto {
         validateInputs(kpiType, period, date)
 
@@ -70,7 +69,11 @@ class FdrKpiService(
         return when (FdrKpiPeriod.valueOf(period)) {
             FdrKpiPeriod.daily ->
                 dailyPspLfdrBuilder(
-                    dateRange.first.atStartOfDay().atOffset(ZoneOffset.UTC),//OffsetDateTime.of(dateRange.first.atStartOfDay(), ZoneOffset.UTC),
+                    dateRange.first
+                        .atStartOfDay()
+                        .atOffset(
+                            ZoneOffset.UTC
+                        ), // OffsetDateTime.of(dateRange.first.atStartOfDay(), ZoneOffset.UTC),
                     totalReports,
                     result[0] as Int,
                     result[1] as Int,
@@ -155,7 +158,8 @@ class FdrKpiService(
         brokerFiscalCode: String?,
         pspId: String?
     ): List<Any> {
-        val preparedQuery = prepareQuery(query, dateRange.first, dateRange.second, brokerFiscalCode, pspId)
+        val preparedQuery =
+            prepareQuery(query, dateRange.first, dateRange.second, brokerFiscalCode, pspId)
         logger.debug("Executing query: $preparedQuery")
         return try {
             val result = reKustoClient.executeQuery("re", preparedQuery)
