@@ -165,6 +165,7 @@ class FdrKpiService(
         logger.debug("Executing query: $preparedQuery")
         return try {
             val result = reKustoClient.executeQuery(database, preparedQuery)
+
             if (!result.primaryResults.next()) {
                 throw NoResultsFoundException(pspId)
             }

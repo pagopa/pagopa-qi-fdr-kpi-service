@@ -5,6 +5,9 @@ import it.pagopa.qi.fdrkpi.exceptionhandler.DateTooRecentException
 import it.pagopa.qi.fdrkpi.exceptionhandler.InvalidPeriodException
 import java.time.LocalDate
 import java.time.YearMonth
+import org.slf4j.LoggerFactory
+
+private val logger = LoggerFactory.getLogger("it.pagopa.qi.fdrkpi.utils.QueryUtils")
 
 fun prepareQuery(
     query: String,
@@ -20,6 +23,7 @@ fun prepareQuery(
 }
 
 fun getDateRange(period: FdrKpiPeriod, date: String): Pair<LocalDate, LocalDate> {
+    logger.info("Calculating date range for period [{}] and date [{}]", period, date)
     return when (period) {
         FdrKpiPeriod.daily -> Pair(LocalDate.parse(date), LocalDate.parse(date))
         FdrKpiPeriod.monthly -> {
