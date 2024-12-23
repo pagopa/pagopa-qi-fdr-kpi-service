@@ -1,7 +1,7 @@
 microservice-chart:
   namespace: "qi"
   nameOverride: ""
-  fullnameOverride: ""
+  fullnameOverride: "pagopa-qi-fdr-kpi-service"
   canaryDelivery:
     create: false
     ingress:
