@@ -74,9 +74,9 @@ microservice-chart:
     AZURE_DATA_EXPLORER_RE_ENDPOINT: "https://pagopaddataexplorer.westeurope.kusto.windows.net"
     AZURE_DATA_EXPLORER_RE_APPLICATION_TENANT_ID: "7788edaf-0346-4068-9d79-c868aed15b3d"
   envSecret:
+    OTEL_EXPORTER_OTLP_HEADERS: elastic-otel-token-header
     AZURE_DATA_EXPLORER_RE_CLIENT_ID: azure-data-explorer-re-client-id
     AZURE_DATA_EXPLORER_RE_APPLICATION_KEY: azure-data-explorer-re-application-key
-    OTEL_EXPORTER_OTLP_HEADERS: elastic-otel-token-header
   keyvault:
     name: "pagopa-d-qi-kv"
     tenantId: "7788edaf-0346-4068-9d79-c868aed15b3d"
