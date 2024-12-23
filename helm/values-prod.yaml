@@ -19,7 +19,7 @@ microservice-chart:
       envConfig: {}
   image:
     repository: pagopapcommonacr.azurecr.io/pagopaqifdrkpiservice
-    tag: "0.1.9"
+    tag: "0.1.10"
     pullPolicy: Always
   livenessProbe:
     handlerType: httpGet
