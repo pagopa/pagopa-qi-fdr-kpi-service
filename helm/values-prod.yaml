@@ -89,7 +89,7 @@ microservice-chart:
     APP_LOGGING_LEVEL: "info"
     WEB_LOGGING_LEVEL: "info"
     ECS_SERVICE_NAME: "pagopa-qi-fdr-kpi-service"
-    ECS_SERVICE_ENVIRONMENT: "dev"
+    ECS_SERVICE_ENVIRONMENT: "prod"
     OTEL_RESOURCE_ATTRIBUTES: "service.name=pagopa-qi-fdr-kpi-service,deployment.environment=prod"
     OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.elastic-system.svc:4317"
     OTEL_LOGS_EXPORTER: none
@@ -124,6 +124,6 @@ microservice-chart:
           podAffinityTerm:
             labelSelector:
               matchLabels:
-                app.kubernetes.io/instance: pagopaecommercehelpdeskservice
-            namespaces: ["ecommerce"]
+                app.kubernetes.io/instance: pagopaqifdrkpiservice
+            namespaces: ["qi"]
             topologyKey: topology.kubernetes.io/zone
