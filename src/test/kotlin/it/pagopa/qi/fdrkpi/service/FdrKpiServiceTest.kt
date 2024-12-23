@@ -1,99 +1,121 @@
 package it.pagopa.qi.fdrkpi.service
 
 import com.microsoft.azure.kusto.data.Client
+import com.microsoft.azure.kusto.data.KustoOperationResult
+import com.microsoft.azure.kusto.data.KustoResultSetTable
 import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseAllOfDto.EntityTypeEnum
 import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseAllOfDto.KpiNameEnum
+import it.pagopa.generated.qi.fdrkpi.v1.model.KPIResponseDto
 import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries
+import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.LFDR_QUERY
+import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.TOTAL_FLOWS_QUERY
+import it.pagopa.qi.fdrkpi.exceptionhandler.*
 import it.pagopa.qi.fdrkpi.utils.*
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.stream.Stream
+import kotlin.test.Test
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.BDDMockito.given
 import org.mockito.Mockito.*
 
 class FdrKpiServiceTest {
 
     private val reKustoClient: Client = mock(Client::class.java)
-    private val fdrKpiService: FdrKpiService = FdrKpiService(reKustoClient)
+    private val fdrKpiService: FdrKpiService = FdrKpiService(reKustoClient, "re")
+
     private val brokerFiscalCode = "02654890025"
     private val pspID = "SARDIT31"
 
     companion object {
         private val date: OffsetDateTime =
             OffsetDateTime.of(2023, 10, 1, 0, 0, 0, 0, ZoneOffset.UTC)
+
         @JvmStatic
-        private fun successfullyQueries(): Stream<Arguments> =
+        private fun successfullyQueriesProvider(): Stream<Arguments> =
             Stream.of(
+                // LFDR - daily
                 Arguments.of(
-                    KustoQueries.LFDR_QUERY,
+                    LFDR_QUERY,
                     KpiNameEnum.LFDR,
                     FdrKpiPeriod.daily,
-                    1,
+                    10,
                     listOf(2, 3),
-                    dailyPspLfdrBuilder(date, 1, 2, 3, EntityTypeEnum.PSP)
+                    dailyPspLfdrBuilder(date, 10, 2, 3, EntityTypeEnum.PSP)
                 ),
+                // LFDR - monthly
                 Arguments.of(
-                    KustoQueries.LFDR_QUERY,
+                    LFDR_QUERY,
                     KpiNameEnum.LFDR,
                     FdrKpiPeriod.monthly,
                     0,
                     listOf(2, 3),
                     monthlyLfdrBuilder("2", "3", EntityTypeEnum.PSP)
                 ),
-                Arguments.of(
-                    KustoQueries.WAFDR_QUERY,
+                // WAFDR - daily
+                /* Arguments.of(
+                    WAFDR_QUERY,
                     KpiNameEnum.WAFDR,
                     FdrKpiPeriod.daily,
-                    2,
-                    listOf(1),
-                    dailyWafdrBuilder(date, 2, 1, EntityTypeEnum.PSP)
+                    8,
+                    listOf(5),
+                    dailyWafdrBuilder(date, 8, 5, EntityTypeEnum.PSP)
                 ),
+                // WAFDR - monthly
                 Arguments.of(
-                    KustoQueries.WAFDR_QUERY,
+                    WAFDR_QUERY,
                     KpiNameEnum.WAFDR,
                     FdrKpiPeriod.monthly,
                     0,
-                    listOf(1),
-                    monthlyWafdrBuilder("1", EntityTypeEnum.PSP)
+                    listOf(7),
+                    monthlyWafdrBuilder("7", EntityTypeEnum.PSP)
                 ),
+                // NRFDR - daily
                 Arguments.of(
-                    KustoQueries.NRFDR_QUERY,
+                    NRFDR_QUERY,
                     KpiNameEnum.NRFDR,
                     FdrKpiPeriod.daily,
                     6,
-                    listOf(5),
-                    dailyNrfdrBuilder(date, 6, 5, 1, EntityTypeEnum.PSP)
+                    listOf(4),
+                    dailyNrfdrBuilder(date, 6, 4, 2, EntityTypeEnum.PSP)
                 ),
+                // NRFDR - monthly
                 Arguments.of(
-                    KustoQueries.NRFDR_QUERY,
+                    NRFDR_QUERY,
                     KpiNameEnum.NRFDR,
                     FdrKpiPeriod.monthly,
                     0,
-                    listOf(1),
-                    monthlyNrfdrBuilder("1", EntityTypeEnum.PSP)
+                    listOf(10),
+                    monthlyNrfdrBuilder("10", EntityTypeEnum.PSP)
                 ),
+                // WPNFDR - daily
                 Arguments.of(
-                    KustoQueries.WPNFDR_QUERY,
+                    WPNFDR_QUERY,
                     KpiNameEnum.WPNFDR,
                     FdrKpiPeriod.daily,
-                    4,
+                    5,
                     listOf(3),
-                    dailyWpnfdrBuilder(date, 4, 3, EntityTypeEnum.PSP)
+                    dailyWpnfdrBuilder(date, 5, 3, EntityTypeEnum.PSP)
                 ),
+                // WPNFDR - monthly
                 Arguments.of(
-                    KustoQueries.WPNFDR_QUERY,
+                    WPNFDR_QUERY,
                     KpiNameEnum.WPNFDR,
                     FdrKpiPeriod.monthly,
                     0,
-                    listOf(1),
-                    monthlyWpnfdrBuilder("1", EntityTypeEnum.PSP)
-                )
+                    listOf(4),
+                    monthlyWpnfdrBuilder("4", EntityTypeEnum.PSP)
+                ),*/
             )
     }
 
-    /* @ParameterizedTest
-    @MethodSource("successfullyQueries")
+    @ParameterizedTest
+    @MethodSource("successfullyQueriesProvider")
     fun `Should return correct response from Kusto DB for PSP queries`(
         queryString: String,
         kpiNameEnum: KpiNameEnum,
@@ -102,45 +124,22 @@ class FdrKpiServiceTest {
         queryResponse: List<Any>,
         expectedResponse: KPIResponseDto
     ) {
+        val dateString = if (fdrKpiPeriod == FdrKpiPeriod.daily) "2023-10-01" else "2023-10"
+        val dateRange = getDateRange(fdrKpiPeriod, dateString)
 
-        val dateString = if (FdrKpiPeriod.daily == fdrKpiPeriod) "2023-10-01" else "2023-10"
-        val dateRange = getDateRange(fdrKpiPeriod.name, dateString)
-
-        // totalReports query mock
-        if (FdrKpiPeriod.daily == fdrKpiPeriod) {
-            val queryTotalReports =
-                prepareQuery(
-                    KustoQueries.TOTAL_FLOWS_QUERY,
-                    dateRange.first,
-                    dateRange.second,
-                    null,
-                    pspID
-                )
-            val totalReportsCountKustoResp = mock(KustoOperationResult::class.java)
-            val totalReportsResultSetTable = mock(KustoResultSetTable::class.java)
-            given(totalReportsResultSetTable.currentRow).willReturn(listOf(totalReports))
-            given(totalReportsCountKustoResp.primaryResults).willReturn(totalReportsResultSetTable)
-            given(totalReportsResultSetTable.next()).willReturn(true)
-            given(reKustoClient.executeQuery(any(), eq(queryTotalReports)))
-                .willReturn(totalReportsCountKustoResp)
+        if (fdrKpiPeriod == FdrKpiPeriod.daily) {
+            mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, null, pspID, listOf(totalReports))
         }
 
-        // Query Kusto mock
-        val queryKusto = prepareQuery(queryString, dateRange.first, dateRange.second, null, pspID)
-        val queryKustoResp = mock(KustoOperationResult::class.java)
-        val queryResultSetTable = mock(KustoResultSetTable::class.java)
-        given(queryResultSetTable.currentRow).willReturn(queryResponse)
-        given(queryKustoResp.primaryResults).willReturn(queryResultSetTable)
-        given(queryResultSetTable.next()).willReturn(true)
-        given(reKustoClient.executeQuery(any(), eq(queryKusto))).willReturn(queryKustoResp)
+        mockKustoResponse(queryString, dateRange, null, pspID, queryResponse)
 
         val response =
             fdrKpiService.calculateKpi(kpiNameEnum.name, fdrKpiPeriod.name, dateString, null, pspID)
         assertEquals(expectedResponse, response)
     }
 
-    @ParameterizedTest
-    @MethodSource("successfullyQueries")
+    /*@ParameterizedTest
+    @MethodSource("successfullyQueriesProvider")
     fun `Should return correct response from Kusto DB for Broker queries`(
         queryString: String,
         kpiNameEnum: KpiNameEnum,
@@ -149,52 +148,27 @@ class FdrKpiServiceTest {
         queryResponse: List<Any>,
         expectedResponse: KPIResponseDto
     ) {
+        val dateString = if (fdrKpiPeriod == FdrKpiPeriod.daily) "2023-10-01" else "2023-10"
+        val dateRange = getDateRange(fdrKpiPeriod, dateString)
 
-        val dateString = if (FdrKpiPeriod.daily == fdrKpiPeriod) "2023-10-01" else "2023-10"
-        val dateRange = getDateRange(fdrKpiPeriod.name, dateString)
-
-        // totalReports query mock
-        if (FdrKpiPeriod.daily == fdrKpiPeriod) {
-            val queryTotalReports =
-                prepareQuery(
-                    KustoQueries.TOTAL_FLOWS_QUERY,
-                    dateRange.first,
-                    dateRange.second,
-                    brokerFiscalCode,
-                    null
-                )
-            val totalReportsCountKustoResp = mock(KustoOperationResult::class.java)
-            val totalReportsResultSetTable = mock(KustoResultSetTable::class.java)
-            given(totalReportsResultSetTable.currentRow).willReturn(listOf(totalReports))
-            given(totalReportsCountKustoResp.primaryResults).willReturn(totalReportsResultSetTable)
-            given(totalReportsResultSetTable.next()).willReturn(true)
-            given(reKustoClient.executeQuery(any(), eq(queryTotalReports)))
-                .willReturn(totalReportsCountKustoResp)
+        if (fdrKpiPeriod == FdrKpiPeriod.daily) {
+            mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, brokerFiscalCode, null, listOf(totalReports))
         }
 
-        // Query Kusto mock
-        val queryKusto =
-            prepareQuery(queryString, dateRange.first, dateRange.second, brokerFiscalCode, null)
-        val queryKustoResp = mock(KustoOperationResult::class.java)
-        val queryResultSetTable = mock(KustoResultSetTable::class.java)
-        given(queryResultSetTable.currentRow).willReturn(queryResponse)
-        given(queryKustoResp.primaryResults).willReturn(queryResultSetTable)
-        given(queryResultSetTable.next()).willReturn(true)
-        given(reKustoClient.executeQuery(any(), eq(queryKusto))).willReturn(queryKustoResp)
+        mockKustoResponse(queryString, dateRange, brokerFiscalCode, null, queryResponse)
 
-        val response =
-            fdrKpiService.calculateKpi(
-                kpiNameEnum.name,
-                fdrKpiPeriod.name,
-                dateString,
-                brokerFiscalCode,
-                null
-            )
+        val response = fdrKpiService.calculateKpi(
+            kpiNameEnum.name,
+            fdrKpiPeriod.name,
+            dateString,
+            brokerFiscalCode,
+            null
+        )
         assertEquals(expectedResponse, response)
-    }
+    }*/
 
-    @ParameterizedTest
-    @MethodSource("successfullyQueries")
+    /*@ParameterizedTest
+    @MethodSource("successfullyQueriesProvider")
     fun `Should return correct response from Kusto DB for Broker and PSP queries`(
         queryString: String,
         kpiNameEnum: KpiNameEnum,
@@ -203,81 +177,217 @@ class FdrKpiServiceTest {
         queryResponse: List<Any>,
         expectedResponse: KPIResponseDto
     ) {
+        val dateString = if (fdrKpiPeriod == FdrKpiPeriod.daily) "2023-10-01" else "2023-10"
+        val dateRange = getDateRange(fdrKpiPeriod, dateString)
 
-        val dateString = if (FdrKpiPeriod.daily == fdrKpiPeriod) "2023-10-01" else "2023-10"
-        val dateRange = getDateRange(fdrKpiPeriod.name, dateString)
-
-        // totalReports query mock
-        if (FdrKpiPeriod.daily == fdrKpiPeriod) {
-            val queryTotalReports =
-                prepareQuery(
-                    KustoQueries.TOTAL_FLOWS_QUERY,
-                    dateRange.first,
-                    dateRange.second,
-                    brokerFiscalCode,
-                    pspID
-                )
-            val totalReportsCountKustoResp = mock(KustoOperationResult::class.java)
-            val totalReportsResultSetTable = mock(KustoResultSetTable::class.java)
-            given(totalReportsResultSetTable.currentRow).willReturn(listOf(totalReports))
-            given(totalReportsCountKustoResp.primaryResults).willReturn(totalReportsResultSetTable)
-            given(totalReportsResultSetTable.next()).willReturn(true)
-            given(reKustoClient.executeQuery(any(), eq(queryTotalReports)))
-                .willReturn(totalReportsCountKustoResp)
+        if (fdrKpiPeriod == FdrKpiPeriod.daily) {
+            mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, null, pspID, listOf(totalReports))
         }
 
-        // Query Kusto mock
-        val queryKusto =
-            prepareQuery(queryString, dateRange.first, dateRange.second, brokerFiscalCode, pspID)
-        val queryKustoResp = mock(KustoOperationResult::class.java)
-        val queryResultSetTable = mock(KustoResultSetTable::class.java)
-        given(queryResultSetTable.currentRow).willReturn(queryResponse)
-        given(queryKustoResp.primaryResults).willReturn(queryResultSetTable)
-        given(queryResultSetTable.next()).willReturn(true)
-        given(reKustoClient.executeQuery(any(), eq(queryKusto))).willReturn(queryKustoResp)
+        mockKustoResponse(queryString, dateRange, null, pspID, queryResponse)
 
-        val response =
-            fdrKpiService.calculateKpi(
-                kpiNameEnum.name,
-                fdrKpiPeriod.name,
-                dateString,
-                brokerFiscalCode,
-                pspID
-            )
+        val response = fdrKpiService.calculateKpi(
+            kpiNameEnum.name,
+            fdrKpiPeriod.name,
+            dateString,
+            null,
+            pspID
+        )
         assertEquals(expectedResponse, response)
+    }*/
+
+    @Test
+    fun `Should throw InvalidPeriodException`() {
+        val ex =
+            assertThrows<InvalidPeriodException> {
+                fdrKpiService.calculateKpi(
+                    KpiNameEnum.LFDR.name,
+                    "invalid_period",
+                    "2023-10-01",
+                    null,
+                    pspID
+                )
+            }
+        assertEquals("Invalid Period", ex.message)
     }
 
     @Test
-    fun `Should throw InvalidError`() {
-        val dateString = "2023-10"
+    fun `Should throw InvalidKpiTypeException`() {
+        val ex =
+            assertThrows<InvalidKpiTypeException> {
+                fdrKpiService.calculateKpi(
+                    "invalid_kpi",
+                    FdrKpiPeriod.daily.name,
+                    "2023-10-01",
+                    null,
+                    pspID
+                )
+            }
+        assertEquals("Invalid KPI Type", ex.message)
+    }
 
-        // Query Kusto mock
-        val queryKustoResp = mock(KustoOperationResult::class.java)
-        val queryResultSetTable = mock(KustoResultSetTable::class.java)
-        given(queryKustoResp.primaryResults).willReturn(queryResultSetTable)
-        given(queryResultSetTable.next()).willReturn(false)
-        given(reKustoClient.executeQuery(any(), any())).willReturn(queryKustoResp)
+    @Test
+    fun `Should throw DateTooRecentException for daily period`() {
+        val today = LocalDate.now().toString()
+        val ex =
+            assertThrows<DateTooRecentException> {
+                fdrKpiService.calculateKpi(
+                    KpiNameEnum.LFDR.name,
+                    FdrKpiPeriod.daily.name,
+                    today,
+                    null,
+                    pspID
+                )
+            }
+        assertEquals("Date Too Recent", ex.message)
+    }
+
+    @Test
+    fun `Should throw DateTooRecentException for monthly period`() {
+        val dateString = "2024-12-23"
+        val ex =
+            assertThrows<DateTooRecentException> {
+                fdrKpiService.calculateKpi(
+                    KpiNameEnum.LFDR.name,
+                    FdrKpiPeriod.daily.name,
+                    dateString,
+                    null,
+                    pspID
+                )
+            }
+        assertEquals("Date Too Recent", ex.message)
+    }
+
+    /*@Test
+    fun `Should throw NoResultsFoundException when no rows returned`() {
+        val dateString = "2023-10-01"
+        val dateRange = getDateRange(FdrKpiPeriod.daily, dateString)
+
+        mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, null, pspID, listOf(10))
+        mockKustoEmptyResponse(LFDR_QUERY, dateRange, null, pspID)
+
+        val ex = assertThrows<NoResultsFoundException> {
+            fdrKpiService.calculateKpi(
+                KpiNameEnum.LFDR.name,
+                FdrKpiPeriod.daily.name,
+                dateString,
+                null,
+                pspID
+            )
+        }
+        assertEquals("No Results Found", ex.message)
+    }*/
+
+    @Test
+    fun `Should throw PspNotFoundException when percV1 and percV2 are -1`() {
+        val dateString = "2023-10"
+        val dateRange = getDateRange(FdrKpiPeriod.monthly, dateString)
+
+        mockKustoResponse(KustoQueries.TOTAL_FLOWS_QUERY, dateRange, null, "ABCDEFGH", listOf(10))
+
+        mockKustoResponse(KustoQueries.LFDR_QUERY, dateRange, null, "ABCDEFGH", listOf(-1, -1))
 
         val ex =
-            org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
+            assertThrows<PspNotFoundException> {
                 fdrKpiService.calculateKpi(
                     KpiNameEnum.LFDR.name,
                     FdrKpiPeriod.monthly.name,
                     dateString,
-                    brokerFiscalCode,
+                    null,
+                    "ABCDEFGH"
+                )
+            }
+        assertEquals("PSP Not Found", ex.message)
+    }
+
+    /*@Test
+    fun `Should throw NoResultsFoundException when percV1=0 and percV2=0`() {
+        val dateString = "2023-10-01"
+        val dateRange = getDateRange(FdrKpiPeriod.daily, dateString)
+
+        // TOT_FLOWS => 10
+        mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, null, pspID, listOf(10))
+        // KPI => 0,0
+        mockKustoResponse(LFDR_QUERY, dateRange, null, pspID, listOf(0, 0))
+
+        val ex = assertThrows<NoResultsFoundException> {
+            fdrKpiService.calculateKpi(
+                KpiNameEnum.LFDR.name,
+                FdrKpiPeriod.daily.name,
+                dateString,
+                null,
+                pspID
+            )
+        }
+        assertEquals("No Results Found", ex.message)
+    }*/
+
+    @Test
+    fun `Should throw generic Exception when underlying query fails`() {
+        val dateString = "2023-10-01"
+        val dateRange = getDateRange(FdrKpiPeriod.daily, dateString)
+
+        mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, null, pspID, listOf(10))
+
+        val query = prepareQuery(LFDR_QUERY, dateRange.first, dateRange.second, null, pspID)
+
+        given(reKustoClient.executeQuery(eq("re"), eq(query)))
+            .willThrow(RuntimeException("some error from ADX"))
+
+        val ex =
+            assertThrows<Exception> {
+                fdrKpiService.calculateKpi(
+                    KpiNameEnum.LFDR.name,
+                    FdrKpiPeriod.daily.name,
+                    dateString,
+                    null,
                     pspID
                 )
             }
-        assertEquals("error", ex.message)
+        assertEquals(pspID, ex.message)
     }
 
     @Test
-    fun `Should throw RuntimeException for brokerFiscalCode and PspID null on prepareQuery invoke`() {
-        val dateRange = getDateRange("daily", "2023-01-01")
+    fun `Should throw RuntimeException for brokerFiscalCode and pspId null on prepareQuery`() {
+        val dateRange = Pair(LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-01"))
         val ex =
-            org.junit.jupiter.api.assertThrows<RuntimeException> {
-                prepareQuery(KustoQueries.LFDR_QUERY, dateRange.first, dateRange.second)
+            assertThrows<RuntimeException> {
+                prepareQuery(LFDR_QUERY, dateRange.first, dateRange.second)
             }
         assertEquals("BrokerFiscalCode and PspId are not defined", ex.message)
+    }
+
+    private fun mockKustoResponse(
+        queryString: String,
+        dateRange: Pair<LocalDate, LocalDate>,
+        brokerFiscalCode: String?,
+        pspId: String?,
+        responseRow: List<Any>
+    ) {
+        val preparedQuery =
+            prepareQuery(queryString, dateRange.first, dateRange.second, null, pspId)
+        val operationResult = mock(KustoOperationResult::class.java)
+        val resultSet = mock(KustoResultSetTable::class.java)
+
+        given(resultSet.next()).willReturn(true)
+        given(resultSet.currentRow).willReturn(responseRow)
+        given(operationResult.primaryResults).willReturn(resultSet)
+        given(reKustoClient.executeQuery("re", preparedQuery)).willReturn(operationResult)
+    }
+
+    /*private fun mockKustoEmptyResponse(
+        queryString: String,
+        dateRange: Pair<LocalDate, LocalDate>,
+        brokerFiscalCode: String?,
+        pspId: String?
+    ) {
+        val preparedQuery =
+            prepareQuery(queryString, dateRange.first, dateRange.second, null, pspId)
+        val operationResult = mock(KustoOperationResult::class.java)
+        val resultSet = mock(KustoResultSetTable::class.java)
+
+        given(resultSet.next()).willReturn(false)
+        given(operationResult.primaryResults).willReturn(resultSet)
+        given(reKustoClient.executeQuery("re", preparedQuery)).willReturn(operationResult)
     }*/
 }

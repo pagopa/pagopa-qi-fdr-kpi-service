@@ -19,11 +19,13 @@ import java.time.ZoneOffset
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
 class FdrKpiService(
     @Autowired val reKustoClient: Client,
+    @Value("\${azuredataexplorer.re.database}") private val database: String
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
@@ -162,23 +164,24 @@ class FdrKpiService(
             prepareQuery(query, dateRange.first, dateRange.second, brokerFiscalCode, pspId)
         logger.debug("Executing query: $preparedQuery")
         return try {
-            val result = reKustoClient.executeQuery(preparedQuery)
+            val result = reKustoClient.executeQuery(database, preparedQuery)
             if (!result.primaryResults.next()) {
                 throw NoResultsFoundException(pspId)
             }
             val row = result.primaryResults.currentRow
-            val percV1 = row[0] as Int
-            val percV2 = row[1] as Int
-            when {
-                percV1 == -1 && percV2 == -1 -> {
-                    throw PspNotFoundException(pspId)
+            if (row.size > 1) {
+                val percV1 = row[0] as Int
+                val percV2 = row[1] as Int
+                when {
+                    percV1 == -1 && percV2 == -1 -> {
+                        throw PspNotFoundException(pspId)
+                    }
+                    else -> {
+                        row
+                    }
                 }
-                percV1 == 0 && percV2 == 0 -> {
-                    throw NoResultsFoundException(pspId)
-                }
-                else -> {
-                    row
-                }
+            } else {
+                row
             }
         } catch (e: PspNotFoundException) {
             throw e
