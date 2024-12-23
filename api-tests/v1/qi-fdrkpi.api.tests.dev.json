@@ -67,6 +67,68 @@
       }
     },
     {
+      "name": "Calculate Monthly KPI - Success (Broker)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Calculate Monthly KPI - Success Response\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response).to.have.property('responseType').to.equal('monthly');",
+              "    pm.expect(response).to.have.property('brokerFiscalCode');",
+              "    pm.expect(response).to.have.property('kpiName');",
+              "    pm.expect(response).to.have.property('kpiDescription');",
+              "    pm.expect(response).to.have.property('kpiDescriptionUrl');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Ocp-Apim-Subscription-Key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE}}?brokerFiscalCode={{BROKER_FISCAL_CODE}}&period={{PERIOD_MONTHLY}}&date={{DATE}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "qi",
+            "fdr-kpi-service",
+            "v1",
+            "fdr-kpi",
+            "{{KPI_TYPE}}"
+          ],
+          "query": [
+            {
+              "key": "brokerFiscalCode",
+              "value": "{{BROKER_FISCAL_CODE}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_MONTHLY}}"
+            },
+            {
+              "key": "date",
+              "value": "{{DATE}}"
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "Calculate KPI - PSP Not Found",
       "event": [
         {
