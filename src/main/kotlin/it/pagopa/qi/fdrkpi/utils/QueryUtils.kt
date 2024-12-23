@@ -24,7 +24,7 @@ fun prepareQuery(
 
 fun getDateRange(period: FdrKpiPeriod, date: String): Pair<LocalDate, LocalDate> {
     logger.info("Calculating date range for period [{}] and date [{}]", period, date)
-    
+
     return when (period) {
         FdrKpiPeriod.daily -> Pair(LocalDate.parse(date), LocalDate.parse(date))
         FdrKpiPeriod.monthly -> {

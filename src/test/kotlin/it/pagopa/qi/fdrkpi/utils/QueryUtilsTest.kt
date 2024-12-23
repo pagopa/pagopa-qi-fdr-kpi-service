@@ -19,7 +19,6 @@ class QueryUtilsTest {
         val pspId = "PSP123"
         val brokerFiscalCode = "01234556789" // Usato come brokerId
 
-
         val result = prepareQuery(query, startDate, endDate, brokerFiscalCode, pspId)
 
         val expected =

@@ -34,20 +34,44 @@ class FdrKpiController(@Autowired private val fdrKpiService: FdrKpiService) : Fd
         pspId: String?
     ): ResponseEntity<KPIResponseDto> {
         val requesterInfo =
-            if (xPspCode != null) {
-                "Broker [$xEntityFiscalCode] (for PSP [$xPspCode])"
-            } else {
-                "PSP [$xEntityFiscalCode]"
+            when {
+                brokerFiscalCode != null && pspId != null ->
+                    "Broker [$brokerFiscalCode] (for PSP [$pspId])"
+                brokerFiscalCode != null -> "Broker [$brokerFiscalCode]"
+                pspId != null -> "PSP [$pspId]"
+                else -> "Unknown requester"
             }
 
         logger.info(
-            "Received [{}] [{}] KPI request from [{}] for date [{}]",
+            "Received [{}] [{}] KPI request from {} for date [{}]",
             period,
             kpiType,
             requesterInfo,
             date
         )
-        val response = fdrKpiService.calculateKpi(kpiType, period, date, brokerFiscalCode, pspId)
-        return ResponseEntity.ok(response)
+
+        try {
+            val response =
+                fdrKpiService.calculateKpi(kpiType, period, date, brokerFiscalCode, pspId)
+            logger.info(
+                "Successfully calculated [{}] [{}] KPI for {} for date [{}]",
+                period,
+                kpiType,
+                requesterInfo,
+                date
+            )
+            return ResponseEntity.ok(response)
+        } catch (e: Exception) {
+            logger.error(
+                "Error calculating [{}] [{}] KPI for {} for date [{}]: {}",
+                period,
+                kpiType,
+                requesterInfo,
+                date,
+                e.message,
+                e
+            )
+            throw e
+        }
     }
 }
