@@ -39,7 +39,7 @@ microservice-chart:
     periodSeconds: 10
   deployment:
     create: true
-    replicas: 1
+    replicas: 3
   service:
     create: true
     type: ClusterIP
@@ -118,3 +118,12 @@ microservice-chart:
                 operator: In
                 values:
                   - user
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/instance: pagopaecommercehelpdeskservice
+            namespaces: ["ecommerce"]
+            topologyKey: topology.kubernetes.io/zone
