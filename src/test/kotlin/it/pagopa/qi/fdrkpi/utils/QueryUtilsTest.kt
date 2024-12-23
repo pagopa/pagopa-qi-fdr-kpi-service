@@ -17,7 +17,7 @@ class QueryUtilsTest {
         val startDate = LocalDate.of(2024, 1, 1)
         val endDate = LocalDate.of(2024, 1, 31)
         val pspId = "PSP123"
-        val brokerFiscalCode = "01234556789" // Usato come brokerId
+        val brokerFiscalCode = "01234556789"
 
         val result = prepareQuery(query, startDate, endDate, brokerFiscalCode, pspId)
 
