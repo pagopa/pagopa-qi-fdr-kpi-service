@@ -72,6 +72,10 @@ stages:
               displayName: 'Health check pagopa-qi-fdr-kpi-service'
             - script: yarn global add newman
               displayName: 'newman installation'
+            - script: |
+                TODAY=$(date '+%Y-%m-%d')
+                sed -i "s/\"DATE_TOO_RECENT\": \".*\"/\"DATE_TOO_RECENT\": \"$TODAY\"/" api-tests/env/fdrkpi_local.env.json
+              displayName: 'Update DATE_TOO_RECENT in environment file'
             - script: newman run api-tests/v1/qi-fdrkpi.api.tests.local.json --environment=api-tests/env/fdrkpi_local.env.json --reporters cli,junit --reporter-junit-export Results/fdrkpi-api-TEST.xml
               displayName: 'Run FdR KPI API test'
               continueOnError: false
