@@ -3,12 +3,15 @@ package it.pagopa.qi.fdrkpi.controller.v1
 import it.pagopa.generated.qi.fdrkpi.v1.api.FdrKpiApi
 import it.pagopa.generated.qi.fdrkpi.v1.model.*
 import it.pagopa.qi.fdrkpi.service.FdrKpiService
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
 @RestController("FdrKpiV1Controller")
 class FdrKpiController(@Autowired private val fdrKpiService: FdrKpiService) : FdrKpiApi {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     /**
      * GET /fdr-kpi/{kpiType}/{period}
      *
@@ -30,7 +33,45 @@ class FdrKpiController(@Autowired private val fdrKpiService: FdrKpiService) : Fd
         brokerFiscalCode: String?,
         pspId: String?
     ): ResponseEntity<KPIResponseDto> {
-        val response = fdrKpiService.calculateKpi(kpiType, period, date, brokerFiscalCode, pspId)
-        return ResponseEntity.ok(response)
+        val requesterInfo =
+            when {
+                brokerFiscalCode != null && pspId != null ->
+                    "Broker [$brokerFiscalCode] (for PSP [$pspId])"
+                brokerFiscalCode != null -> "Broker [$brokerFiscalCode]"
+                pspId != null -> "PSP [$pspId]"
+                else -> "Unknown requester"
+            }
+
+        logger.info(
+            "Received [{}] [{}] KPI request from {} for date [{}]",
+            period,
+            kpiType,
+            requesterInfo,
+            date
+        )
+
+        try {
+            val response =
+                fdrKpiService.calculateKpi(kpiType, period, date, brokerFiscalCode, pspId)
+            logger.info(
+                "Successfully calculated [{}] [{}] KPI for {} for date [{}]",
+                period,
+                kpiType,
+                requesterInfo,
+                date
+            )
+            return ResponseEntity.ok(response)
+        } catch (e: Exception) {
+            logger.error(
+                "Error calculating [{}] [{}] KPI for {} for date [{}]: {}",
+                period,
+                kpiType,
+                requesterInfo,
+                date,
+                e.message,
+                e
+            )
+            throw e
+        }
     }
 }
