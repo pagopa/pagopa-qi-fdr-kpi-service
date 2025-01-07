@@ -2,8 +2,8 @@ apiVersion: v2
 name: pagopa-qi-fdr-kpi-service
 description: Microservice that handles KPI for FDR
 type: application
-version: 0.2.5
-appVersion: 0.1.10
+version: 1.0.1
+appVersion: 1.0.1
 dependencies:
   - name: microservice-chart
     version: 2.3.1
