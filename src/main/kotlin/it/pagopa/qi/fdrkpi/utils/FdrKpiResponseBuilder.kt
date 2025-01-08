@@ -15,54 +15,66 @@ val KPI_DESCRIPTION_URI =
     )
 
 // --- lfdr
-fun dailyPspLfdrBuilder(
+fun dailyLfdrBuilder(
     paymentDate: OffsetDateTime,
     totalReports: Int,
     lateFdrV1: Int,
     lateFdrV2: Int,
     entityType: EntityTypeEnum,
+    brokerId: String?,
+    pspId: String?
 ): DailyLFDRMetricsDto {
     logger.debug(
-        "Building daily LFDR metrics for date [{}], total reports: [{}], late FDR v1: [{}], late FDR v2: [{}], entity type: [{}]",
+        "Building daily LFDR metrics for date [{}], total reports: [{}], late FDR v1: [{}], late FDR v2: [{}], entity type: [{}], pspId: [{}], brokerId: [{}]",
         paymentDate,
         totalReports,
         lateFdrV1,
         lateFdrV2,
-        entityType
+        entityType,
+        pspId,
+        brokerId
     )
     return DailyLFDRMetricsDto(
-        paymentDate,
-        totalReports,
-        "daily",
-        lateFdrV1,
-        lateFdrV2,
-        "FdR in ritardo",
-        KPI_DESCRIPTION_URI,
-        entityType,
-        KpiNameEnum.LFDR
-    )
+            paymentDate,
+            totalReports,
+            "daily",
+            lateFdrV1,
+            lateFdrV2,
+            "FdR in ritardo",
+            KPI_DESCRIPTION_URI,
+            entityType,
+            KpiNameEnum.LFDR
+        )
+        .pspId(pspId)
+        .brokerId(brokerId)
 }
 
 fun monthlyLfdrBuilder(
     kpiLfdrV1Value: String,
     kpiLfdrV2Value: String,
     entityType: EntityTypeEnum,
+    brokerId: String?,
+    pspId: String?
 ): MonthlyLFDRMetricsDto {
     logger.debug(
-        "Building monthly LFDR metrics with v1 value: [{}], v2 value: [{}], entity type: [{}]",
+        "Building monthly LFDR metrics with v1 value: [{}], v2 value: [{}], entity type: [{}], pspId: [{}], brokerId: [{}]",
         kpiLfdrV1Value,
         kpiLfdrV2Value,
-        entityType
+        entityType,
+        pspId,
+        brokerId
     )
     return MonthlyLFDRMetricsDto(
-        "monthly",
-        kpiLfdrV1Value,
-        kpiLfdrV2Value,
-        "FdR in ritardo",
-        KPI_DESCRIPTION_URI,
-        entityType,
-        KpiNameEnum.LFDR
-    )
+            "monthly",
+            kpiLfdrV1Value,
+            kpiLfdrV2Value,
+            "FdR in ritardo",
+            KPI_DESCRIPTION_URI,
+            entityType,
+            KpiNameEnum.LFDR
+        )
+        .pspId(pspId)
+        .brokerId(brokerId)
 }
 
 // --- Nrfdr
@@ -72,42 +84,57 @@ fun dailyNrfdrBuilder(
     missingReports: Int,
     foundReports: Int,
     entityType: EntityTypeEnum,
+    brokerId: String?,
+    pspId: String?
 ): DailyNRFDRMetricsDto {
     logger.debug(
-        "Building daily NRFDR metrics for date [{}], total reports: [{}], missing reports: [{}], found reports: [{}], entity type: [{}]",
+        "Building daily NRFDR metrics for date [{}], total reports: [{}], missing reports: [{}], found reports: [{}], entity type: [{}], pspId: [{}], brokerId: [{}]",
         paymentDate,
         totalReports,
         missingReports,
         foundReports,
-        entityType
+        entityType,
+        pspId,
+        brokerId
     )
     return DailyNRFDRMetricsDto(
-        paymentDate,
-        totalReports,
-        "daily",
-        missingReports,
-        foundReports,
-        "FdR non rendicontati",
-        KPI_DESCRIPTION_URI,
-        entityType,
-        KpiNameEnum.NRFDR
-    )
+            paymentDate,
+            totalReports,
+            "daily",
+            missingReports,
+            foundReports,
+            "FdR non rendicontati",
+            KPI_DESCRIPTION_URI,
+            entityType,
+            KpiNameEnum.NRFDR
+        )
+        .pspId(pspId)
+        .brokerId(brokerId)
 }
 
-fun monthlyNrfdrBuilder(kpiValue: String, entityType: EntityTypeEnum): MonthlyNRFDRMetricsDto {
+fun monthlyNrfdrBuilder(
+    kpiValue: String,
+    entityType: EntityTypeEnum,
+    brokerId: String?,
+    pspId: String?
+): MonthlyNRFDRMetricsDto {
     logger.debug(
-        "Building monthly NRFDR metrics with value: [{}], entity type: [{}]",
+        "Building monthly NRFDR metrics with value: [{}], entity type: [{}], pspId: [{}], brokerId: [{}]",
         kpiValue,
-        entityType
+        entityType,
+        pspId,
+        brokerId
     )
     return MonthlyNRFDRMetricsDto(
-        kpiValue,
-        "monthly",
-        "FdR non rendicontati",
-        KPI_DESCRIPTION_URI,
-        entityType,
-        KpiNameEnum.NRFDR
-    )
+            kpiValue,
+            "monthly",
+            "FdR non rendicontati",
+            KPI_DESCRIPTION_URI,
+            entityType,
+            KpiNameEnum.NRFDR
+        )
+        .pspId(pspId)
+        .brokerId(brokerId)
 }
 
 // --- Wpnfdr
@@ -115,41 +142,56 @@ fun dailyWpnfdrBuilder(
     paymentDate: OffsetDateTime,
     totalReports: Int,
     totalDiffNum: Int,
-    entityType: EntityTypeEnum
+    entityType: EntityTypeEnum,
+    brokerId: String?,
+    pspId: String?
 ): DailyWPNFDRMetricsDto {
     logger.debug(
-        "Building daily WPNFDR metrics for date [{}], total reports: [{}], total diff num: [{}], entity type: [{}]",
+        "Building daily WPNFDR metrics for date [{}], total reports: [{}], total diff num: [{}], entity type: [{}], pspId: [{}], brokerId: [{}]",
         paymentDate,
         totalReports,
         totalDiffNum,
-        entityType
+        entityType,
+        pspId,
+        brokerId
     )
     return DailyWPNFDRMetricsDto(
-        paymentDate,
-        totalReports,
-        "daily",
-        totalDiffNum,
-        "FdR con numero di pagamenti errato",
-        KPI_DESCRIPTION_URI,
-        entityType,
-        KpiNameEnum.WPNFDR
-    )
+            paymentDate,
+            totalReports,
+            "daily",
+            totalDiffNum,
+            "FdR con numero di pagamenti errato",
+            KPI_DESCRIPTION_URI,
+            entityType,
+            KpiNameEnum.WPNFDR
+        )
+        .pspId(pspId)
+        .brokerId(brokerId)
 }
 
-fun monthlyWpnfdrBuilder(kpiValue: String, entityType: EntityTypeEnum): MonthlyWPNFDRMetricsDto {
+fun monthlyWpnfdrBuilder(
+    kpiValue: String,
+    entityType: EntityTypeEnum,
+    brokerId: String?,
+    pspId: String?
+): MonthlyWPNFDRMetricsDto {
     logger.debug(
-        "Building monthly WPNFDR metrics with value: [{}], entity type: [{}]",
+        "Building monthly WPNFDR metrics with value: [{}], entity type: [{}], pspId: [{}], brokerId: [{}]",
         kpiValue,
-        entityType
+        entityType,
+        pspId,
+        brokerId
     )
     return MonthlyWPNFDRMetricsDto(
-        kpiValue,
-        "monthly",
-        "FdR con numero di pagamenti errato",
-        KPI_DESCRIPTION_URI,
-        entityType,
-        KpiNameEnum.WPNFDR
-    )
+            kpiValue,
+            "monthly",
+            "FdR con numero di pagamenti errato",
+            KPI_DESCRIPTION_URI,
+            entityType,
+            KpiNameEnum.WPNFDR
+        )
+        .pspId(pspId)
+        .brokerId(brokerId)
 }
 
 // --- Wafdr
@@ -157,39 +199,54 @@ fun dailyWafdrBuilder(
     paymentDate: OffsetDateTime,
     totalReports: Int,
     totalDiffNum: Int,
-    entityType: EntityTypeEnum
+    entityType: EntityTypeEnum,
+    brokerId: String?,
+    pspId: String?
 ): DailyWAFDRMetricsDto {
     logger.debug(
-        "Building daily WAFDR metrics for date [{}], total reports: [{}], total diff num: [{}], entity type: [{}]",
+        "Building daily WAFDR metrics for date [{}], total reports: [{}], total diff num: [{}], entity type: [{}], pspId: [{}], brokerId: [{}]",
         paymentDate,
         totalReports,
         totalDiffNum,
-        entityType
+        entityType,
+        pspId,
+        brokerId
     )
     return DailyWAFDRMetricsDto(
-        paymentDate,
-        totalReports,
-        "daily",
-        totalDiffNum,
-        "FdR con importo errato",
-        KPI_DESCRIPTION_URI,
-        entityType,
-        KpiNameEnum.WAFDR
-    )
+            paymentDate,
+            totalReports,
+            "daily",
+            totalDiffNum,
+            "FdR con importo errato",
+            KPI_DESCRIPTION_URI,
+            entityType,
+            KpiNameEnum.WAFDR
+        )
+        .pspId(pspId)
+        .brokerId(brokerId)
 }
 
-fun monthlyWafdrBuilder(kpiValue: String, entityType: EntityTypeEnum): MonthlyWPNFDRMetricsDto {
+fun monthlyWafdrBuilder(
+    kpiValue: String,
+    entityType: EntityTypeEnum,
+    brokerId: String?,
+    pspId: String?
+): MonthlyWPNFDRMetricsDto {
     logger.debug(
-        "Building monthly WAFDR metrics with value: [{}], entity type: [{}]",
+        "Building monthly WAFDR metrics with value: [{}], entity type: [{}], pspId: [{}], brokerId: [{}]",
         kpiValue,
-        entityType
+        entityType,
+        pspId,
+        brokerId
     )
     return MonthlyWPNFDRMetricsDto(
-        kpiValue,
-        "monthly",
-        "FdR con importo errato",
-        KPI_DESCRIPTION_URI,
-        entityType,
-        KpiNameEnum.WAFDR
-    )
+            kpiValue,
+            "monthly",
+            "FdR con importo errato",
+            KPI_DESCRIPTION_URI,
+            entityType,
+            KpiNameEnum.WAFDR
+        )
+        .pspId(pspId)
+        .brokerId(brokerId)
 }
