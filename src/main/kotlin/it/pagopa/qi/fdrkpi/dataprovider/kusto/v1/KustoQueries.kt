@@ -23,9 +23,9 @@ object KustoQueries {
     fun generateIdFilter(brokerId: String?, pspId: String?): String {
         return when {
             pspId != null && brokerId != null ->
-                "| where ID_PSP == \"$pspId\" and ID_BROKER_PSP == $brokerId"
+                "| where ID_PSP == \"$pspId\" and ID_BROKER_PSP == \"$brokerId\""
             pspId != null -> "| where ID_PSP == \"$pspId\""
-            brokerId != null -> "| where ID_BROKER_PSP == $brokerId"
+            brokerId != null -> "| where ID_BROKER_PSP == \"$brokerId\""
             else -> throw RuntimeException("BrokerId and PspId are not defined")
         }
     }

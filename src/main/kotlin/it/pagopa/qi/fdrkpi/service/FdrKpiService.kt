@@ -86,7 +86,7 @@ class FdrKpiService(
                 monthlyLfdrBuilder(
                     result[0].toString(),
                     result[1].toString(),
-                    EntityTypeEnum.PSP,
+                    entityType,
                     brokerId,
                     pspId
                 )

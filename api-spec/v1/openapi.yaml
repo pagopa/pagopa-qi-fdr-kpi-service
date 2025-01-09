@@ -133,9 +133,6 @@ components:
             - entityType
             - kpiName
           properties:
-            pspId:
-              type: string
-              example: "CIPBITMM"
             entityType:
               type: string
               enum: [ psp, broker ]
@@ -160,15 +157,11 @@ components:
     BrokerIdentifier:
       type: object
       required:
-        - idBrokerPsp
-        - pspId
+        - brokerId
       properties:
-        idBrokerPsp:
+        brokerId:
           type: string
           example: "02654890025"
-        pspId:
-          type: string
-          example: "CIPBITMM"
 
     DailyKPIBase:
       type: object

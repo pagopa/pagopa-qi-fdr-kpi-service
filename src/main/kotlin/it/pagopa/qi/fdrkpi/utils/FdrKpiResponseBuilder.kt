@@ -45,8 +45,8 @@ fun dailyLfdrBuilder(
             entityType,
             KpiNameEnum.LFDR
         )
-        .pspId(pspId)
-        .brokerId(brokerId)
+        .pspId(pspId ?: "non specificato")
+        .brokerId(brokerId ?: "non specificato")
 }
 
 fun monthlyLfdrBuilder(
@@ -73,8 +73,8 @@ fun monthlyLfdrBuilder(
             entityType,
             KpiNameEnum.LFDR
         )
-        .pspId(pspId)
-        .brokerId(brokerId)
+        .pspId(pspId ?: "non specificato")
+        .brokerId(brokerId ?: "non specificato")
 }
 
 // --- Nrfdr
@@ -108,8 +108,8 @@ fun dailyNrfdrBuilder(
             entityType,
             KpiNameEnum.NRFDR
         )
-        .pspId(pspId)
-        .brokerId(brokerId)
+        .pspId(pspId ?: "non specificato")
+        .brokerId(brokerId ?: "non specificato")
 }
 
 fun monthlyNrfdrBuilder(
@@ -133,8 +133,8 @@ fun monthlyNrfdrBuilder(
             entityType,
             KpiNameEnum.NRFDR
         )
-        .pspId(pspId)
-        .brokerId(brokerId)
+        .pspId(pspId ?: "non specificato")
+        .brokerId(brokerId ?: "non specificato")
 }
 
 // --- Wpnfdr
@@ -165,8 +165,8 @@ fun dailyWpnfdrBuilder(
             entityType,
             KpiNameEnum.WPNFDR
         )
-        .pspId(pspId)
-        .brokerId(brokerId)
+        .pspId(pspId ?: "non specificato")
+        .brokerId(brokerId ?: "non specificato")
 }
 
 fun monthlyWpnfdrBuilder(
@@ -190,8 +190,8 @@ fun monthlyWpnfdrBuilder(
             entityType,
             KpiNameEnum.WPNFDR
         )
-        .pspId(pspId)
-        .brokerId(brokerId)
+        .pspId(pspId ?: "non specificato")
+        .brokerId(brokerId ?: "non specificato")
 }
 
 // --- Wafdr
@@ -222,8 +222,8 @@ fun dailyWafdrBuilder(
             entityType,
             KpiNameEnum.WAFDR
         )
-        .pspId(pspId)
-        .brokerId(brokerId)
+        .pspId(pspId ?: "non specificato")
+        .brokerId(brokerId ?: "non specificato")
 }
 
 fun monthlyWafdrBuilder(
@@ -247,6 +247,6 @@ fun monthlyWafdrBuilder(
             entityType,
             KpiNameEnum.WAFDR
         )
-        .pspId(pspId)
-        .brokerId(brokerId)
+        .pspId(pspId ?: "non specificato")
+        .brokerId(brokerId ?: "non specificato")
 }

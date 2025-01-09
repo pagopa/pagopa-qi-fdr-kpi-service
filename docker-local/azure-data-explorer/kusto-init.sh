@@ -53,7 +53,7 @@ while true; do
             --header 'Content-Type: application/json' \
             --data '{
                 "db": "NetDefaultDB",
-                "csl": ".ingest inline into table KPI_RENDICONTAZIONI <| 2023-10-01T00:00:00Z, 01153230360,SARDIT31,3,1,3,2,2,2,2"
+                "csl": ".ingest inline into table KPI_RENDICONTAZIONI <| 2023-10-01T00:00:00Z,01153230360,SARDIT31,3,1,3,2,2,2,2"
             }'
             echo "KPI_RENDICONTAZIONI table populated"
 
