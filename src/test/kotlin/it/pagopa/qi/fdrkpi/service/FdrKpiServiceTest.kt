@@ -48,7 +48,7 @@ class FdrKpiServiceTest {
                     KpiNameEnum.LFDR,
                     FdrKpiPeriod.daily,
                     10,
-                    listOf(2, 3),
+                    listOf(20, 30),
                     dailyLfdrBuilder(date, 10, 2, 3, EntityTypeEnum.PSP, null, pspID)
                 ),
                 // LFDR - monthly
@@ -74,7 +74,7 @@ class FdrKpiServiceTest {
                     LFDR_QUERY,
                     FdrKpiPeriod.daily,
                     10,
-                    listOf(2, 3),
+                    listOf(20, 30),
                     dailyLfdrBuilder(
                         paymentDate = OffsetDateTime.of(2023, 10, 1, 0, 0, 0, 0, ZoneOffset.UTC),
                         totalReports = 10,
@@ -91,7 +91,7 @@ class FdrKpiServiceTest {
                     WAFDR_QUERY,
                     FdrKpiPeriod.daily,
                     10,
-                    listOf(3),
+                    listOf(30),
                     dailyWafdrBuilder(
                         paymentDate = OffsetDateTime.of(2023, 10, 1, 0, 0, 0, 0, ZoneOffset.UTC),
                         totalReports = 10,
@@ -116,7 +116,7 @@ class FdrKpiServiceTest {
                     NRFDR_QUERY,
                     FdrKpiPeriod.daily,
                     10,
-                    listOf(2),
+                    listOf(20),
                     dailyNrfdrBuilder(
                         paymentDate = OffsetDateTime.of(2023, 10, 1, 0, 0, 0, 0, ZoneOffset.UTC),
                         totalReports = 10,
@@ -142,7 +142,7 @@ class FdrKpiServiceTest {
                     WPNFDR_QUERY,
                     FdrKpiPeriod.daily,
                     10,
-                    listOf(4),
+                    listOf(40),
                     dailyWpnfdrBuilder(
                         paymentDate = OffsetDateTime.of(2023, 10, 1, 0, 0, 0, 0, ZoneOffset.UTC),
                         totalReports = 10,
