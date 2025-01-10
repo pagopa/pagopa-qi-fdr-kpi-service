@@ -20,7 +20,7 @@ paths:
         - qiFdr
       operationId: calculateKpi
       parameters:
-        - name: brokerFiscalCode
+        - name: brokerId
           in: query
           required: false
           schema:
@@ -114,6 +114,10 @@ components:
         - kpiDescription
         - kpiDescriptionUrl
       properties:
+        pspId:
+          type: string
+        brokerId:
+          type: string
         kpiDescription:
           type: string
         kpiDescriptionUrl:
@@ -129,9 +133,6 @@ components:
             - entityType
             - kpiName
           properties:
-            idPsp:
-              type: string
-              example: "CIPBITMM"
             entityType:
               type: string
               enum: [ psp, broker ]
@@ -147,24 +148,20 @@ components:
     PSPIdentifier:
       type: object
       required:
-        - idPsp
+        - pspId
       properties:
-        idPsp:
+        pspId:
           type: string
           example: "CIPBITMM"
 
     BrokerIdentifier:
       type: object
       required:
-        - idBrokerPsp
-        - idPsp
+        - brokerId
       properties:
-        idBrokerPsp:
+        brokerId:
           type: string
           example: "02654890025"
-        idPsp:
-          type: string
-          example: "CIPBITMM"
 
     DailyKPIBase:
       type: object

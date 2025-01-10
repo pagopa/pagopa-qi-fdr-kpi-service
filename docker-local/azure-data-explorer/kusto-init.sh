@@ -53,7 +53,25 @@ while true; do
             --header 'Content-Type: application/json' \
             --data '{
                 "db": "NetDefaultDB",
-                "csl": ".ingest inline into table KPI_RENDICONTAZIONI <| 2023-10-01T00:00:00Z, 01153230360,SARDIT31,3,1,3,2,2,2,2"
+                "csl": ".ingest inline into table KPI_RENDICONTAZIONI <| 2023-10-01T00:00:00Z,01153230360,SARDIT31,3,1,2,2,2,2,2"
+            }'
+            curl -s -o /dev/null --location 'http://localhost:8080/v1/rest/mgmt' \
+            --header 'Content-Type: application/json' \
+            --data '{
+                "db": "NetDefaultDB",
+                "csl": ".ingest inline into table KPI_RENDICONTAZIONI <| 2023-10-01T00:00:00Z,,CIPBITMM,100,0,100,0,0,0,0"
+            }'
+            curl -s -o /dev/null --location 'http://localhost:8080/v1/rest/mgmt' \
+            --header 'Content-Type: application/json' \
+            --data '{
+                "db": "NetDefaultDB",
+                "csl": ".ingest inline into table KPI_RENDICONTAZIONI <| 2023-10-01T00:00:00Z,01245211456,BCITITMMXXX,6,2,4,3,3,3,3"
+            }'
+            curl -s -o /dev/null --location 'http://localhost:8080/v1/rest/mgmt' \
+            --header 'Content-Type: application/json' \
+            --data '{
+                "db": "NetDefaultDB",
+                "csl": ".ingest inline into table KPI_RENDICONTAZIONI <| 2023-10-01T00:00:00Z,01245211456,SATYLUL1XXX,50,25,25,4,4,4,4"
             }'
             echo "KPI_RENDICONTAZIONI table populated"
 
