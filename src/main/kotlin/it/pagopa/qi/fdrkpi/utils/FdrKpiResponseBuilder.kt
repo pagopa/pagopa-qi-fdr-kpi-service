@@ -8,6 +8,7 @@ import java.time.OffsetDateTime
 import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("it.pagopa.qi.fdrkpi.utils.FdrKpiResponseBuilder")
+const val NOT_SPECIFIED = "non specificato"
 
 val KPI_DESCRIPTION_URI =
     URI(
@@ -45,8 +46,8 @@ fun dailyLfdrBuilder(
             entityType,
             KpiNameEnum.LFDR
         )
-        .pspId(pspId ?: "non specificato")
-        .brokerId(brokerId ?: "non specificato")
+        .pspId(pspId ?: NOT_SPECIFIED)
+        .brokerId(brokerId ?: NOT_SPECIFIED)
 }
 
 fun monthlyLfdrBuilder(
@@ -73,8 +74,8 @@ fun monthlyLfdrBuilder(
             entityType,
             KpiNameEnum.LFDR
         )
-        .pspId(pspId ?: "non specificato")
-        .brokerId(brokerId ?: "non specificato")
+        .pspId(pspId ?: NOT_SPECIFIED)
+        .brokerId(brokerId ?: NOT_SPECIFIED)
 }
 
 // --- Nrfdr
@@ -108,8 +109,8 @@ fun dailyNrfdrBuilder(
             entityType,
             KpiNameEnum.NRFDR
         )
-        .pspId(pspId ?: "non specificato")
-        .brokerId(brokerId ?: "non specificato")
+        .pspId(pspId ?: NOT_SPECIFIED)
+        .brokerId(brokerId ?: NOT_SPECIFIED)
 }
 
 fun monthlyNrfdrBuilder(
@@ -133,8 +134,8 @@ fun monthlyNrfdrBuilder(
             entityType,
             KpiNameEnum.NRFDR
         )
-        .pspId(pspId ?: "non specificato")
-        .brokerId(brokerId ?: "non specificato")
+        .pspId(pspId ?: NOT_SPECIFIED)
+        .brokerId(brokerId ?: NOT_SPECIFIED)
 }
 
 // --- Wpnfdr
@@ -165,8 +166,8 @@ fun dailyWpnfdrBuilder(
             entityType,
             KpiNameEnum.WPNFDR
         )
-        .pspId(pspId ?: "non specificato")
-        .brokerId(brokerId ?: "non specificato")
+        .pspId(pspId ?: NOT_SPECIFIED)
+        .brokerId(brokerId ?: NOT_SPECIFIED)
 }
 
 fun monthlyWpnfdrBuilder(
@@ -190,8 +191,8 @@ fun monthlyWpnfdrBuilder(
             entityType,
             KpiNameEnum.WPNFDR
         )
-        .pspId(pspId ?: "non specificato")
-        .brokerId(brokerId ?: "non specificato")
+        .pspId(pspId ?: NOT_SPECIFIED)
+        .brokerId(brokerId ?: NOT_SPECIFIED)
 }
 
 // --- Wafdr
@@ -222,8 +223,8 @@ fun dailyWafdrBuilder(
             entityType,
             KpiNameEnum.WAFDR
         )
-        .pspId(pspId ?: "non specificato")
-        .brokerId(brokerId ?: "non specificato")
+        .pspId(pspId ?: NOT_SPECIFIED)
+        .brokerId(brokerId ?: NOT_SPECIFIED)
 }
 
 fun monthlyWafdrBuilder(
@@ -247,6 +248,6 @@ fun monthlyWafdrBuilder(
             entityType,
             KpiNameEnum.WAFDR
         )
-        .pspId(pspId ?: "non specificato")
-        .brokerId(brokerId ?: "non specificato")
+        .pspId(pspId ?: NOT_SPECIFIED)
+        .brokerId(brokerId ?: NOT_SPECIFIED)
 }

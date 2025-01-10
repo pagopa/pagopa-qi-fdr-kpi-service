@@ -69,27 +69,30 @@ class FdrKpiService(
         val result = executeQuery(LFDR_QUERY, dateRange, brokerId, pspId)
         val entityType = if (brokerId != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
 
-        // calculate daily values from percentages for v1 and v2 (to avoid editing the provided
-        // query)
-        val percentageLateFirst = result[0] as Int
-        val percentageLateSecond = result[1] as Int
-
-        val lateReportsFirst =
-            when {
-                percentageLateFirst < 0 ->
-                    0 // handle the -1 case from query (e.g. no flows for specified psp/broker)
-                else -> ((totalReports.toDouble() * percentageLateFirst) / 100).roundToInt()
-            }
-
-        val lateReportsSecond =
-            when {
-                percentageLateSecond < 0 ->
-                    0 // handle the -1 case from query (e.g. no flows for specified psp/broker)
-                else -> ((totalReports.toDouble() * percentageLateSecond) / 100).roundToInt()
-            }
-
         return when (FdrKpiPeriod.valueOf(period)) {
-            FdrKpiPeriod.daily ->
+            FdrKpiPeriod.daily -> {
+
+                /*
+                    calculate daily values from percentages for v1 and v2 (to avoid editing the provided query)
+                */
+                val percentageLateFirst = result[0] as Int
+                val percentageLateSecond = result[1] as Int
+
+                val lateReportsFirst =
+                    when {
+                        percentageLateFirst < 0 ->
+                            0 /* handle the -1 case from query (e.g. no flows for specified psp/broker) */
+                        else -> ((totalReports.toDouble() * percentageLateFirst) / 100).roundToInt()
+                    }
+
+                val lateReportsSecond =
+                    when {
+                        percentageLateSecond < 0 ->
+                            0 /* handle the -1 case from query (e.g. no flows for specified psp/broker) */
+                        else ->
+                            ((totalReports.toDouble() * percentageLateSecond) / 100).roundToInt()
+                    }
+
                 dailyLfdrBuilder(
                     dateRange.first.atStartOfDay().atOffset(ZoneOffset.UTC),
                     totalReports,
@@ -99,6 +102,7 @@ class FdrKpiService(
                     brokerId,
                     pspId
                 )
+            }
             FdrKpiPeriod.monthly ->
                 monthlyLfdrBuilder(
                     result[0].toString(),
@@ -120,17 +124,9 @@ class FdrKpiService(
         val result = executeQuery(WAFDR_QUERY, dateRange, brokerId, pspId)
         val entityType = if (brokerId != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
 
-        // calculate daily value from percentage (to avoid editing the provided query)
-        val percentageWrong = result[0] as Int
-        val wrongAmountReports =
-            when {
-                percentageWrong < 0 ->
-                    0 // handle the -1 case from query (e.g. no flows for specified psp/broker)
-                else -> ((totalReports.toDouble() * percentageWrong) / 100).roundToInt()
-            }
-
         return when (FdrKpiPeriod.valueOf(period)) {
-            FdrKpiPeriod.daily ->
+            FdrKpiPeriod.daily -> {
+                val wrongAmountReports = calculateDailyKPIValues(result, totalReports)
                 dailyWafdrBuilder(
                     dateRange.first.atStartOfDay().atOffset(ZoneOffset.UTC),
                     totalReports,
@@ -139,6 +135,7 @@ class FdrKpiService(
                     brokerId,
                     pspId
                 )
+            }
             FdrKpiPeriod.monthly ->
                 monthlyWafdrBuilder(result[0].toString(), entityType, brokerId, pspId)
         }
@@ -154,17 +151,9 @@ class FdrKpiService(
         val result = executeQuery(NRFDR_QUERY, dateRange, brokerId, pspId)
         val entityType = if (brokerId != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
 
-        // calculate daily value from percentage (to avoid editing the provided query)
-        val percentageMissing = result[0] as Int
-        val missingReports =
-            when {
-                percentageMissing < 0 ->
-                    0 // handle the -1 case from query (e.g. no flows for specified psp/broker)
-                else -> ((totalReports.toDouble() * percentageMissing) / 100).roundToInt()
-            }
-
         return when (FdrKpiPeriod.valueOf(period)) {
-            FdrKpiPeriod.daily ->
+            FdrKpiPeriod.daily -> {
+                val missingReports = calculateDailyKPIValues(result, totalReports)
                 dailyNrfdrBuilder(
                     dateRange.first.atStartOfDay().atOffset(ZoneOffset.UTC),
                     totalReports,
@@ -174,6 +163,7 @@ class FdrKpiService(
                     brokerId,
                     pspId
                 )
+            }
             FdrKpiPeriod.monthly ->
                 monthlyNrfdrBuilder(result[0].toString(), entityType, brokerId, pspId)
         }
@@ -189,20 +179,9 @@ class FdrKpiService(
         val result = executeQuery(WPNFDR_QUERY, dateRange, brokerId, pspId)
         val entityType = if (brokerId != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
 
-        /*
-            calculate daily value from percentage (to avoid editing the provided query)
-            the rounding is necessary to handle small amounts, e.g. 3 * 33 / 100 would be < 1 and would display 0
-        */
-        val percentageWrongPaymentNum = result[0] as Int
-        val wrongPaymentNumReports =
-            when {
-                percentageWrongPaymentNum < 0 ->
-                    0 // handle the -1 case from query (e.g. no flows for specified psp/broker)
-                else -> ((totalReports.toDouble() * percentageWrongPaymentNum) / 100).roundToInt()
-            }
-
         return when (FdrKpiPeriod.valueOf(period)) {
-            FdrKpiPeriod.daily ->
+            FdrKpiPeriod.daily -> {
+                val wrongPaymentNumReports = calculateDailyKPIValues(result, totalReports)
                 dailyWpnfdrBuilder(
                     dateRange.first.atStartOfDay().atOffset(ZoneOffset.UTC),
                     totalReports,
@@ -211,6 +190,7 @@ class FdrKpiService(
                     brokerId,
                     pspId
                 )
+            }
             FdrKpiPeriod.monthly ->
                 monthlyWpnfdrBuilder(result[0].toString(), entityType, brokerId, pspId)
         }
