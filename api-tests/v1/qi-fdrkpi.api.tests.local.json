@@ -5,17 +5,20 @@
   },
   "item": [
     {
-      "name": "QI FdR Calculate Monthly KPI - Success (Direct PSP)",
+      "name": "QI FdR Calculate Monthly LFDR KPI - Success (PSP)",
       "event": [
         {
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test(\"Calculate Monthly KPI - Success Response\", function () {",
+              "pm.test(\"Calculate Monthly LFDR KPI - Success Response\", function () {",
               "    pm.response.to.have.status(200);",
               "    const response = pm.response.json();",
-              "    pm.expect(response).to.have.property('responseType').to.equal('monthly');",
-              "    pm.expect(response).to.have.property('idPsp');",
+              "    const period = pm.request.url.query.find(q => q.key === 'period').value;",
+              "    const kpiType = pm.request.url.path[1];",
+              "    const expectedResponseType = `${period === 'monthly' ? 'Monthly' : 'Daily'}${kpiType}Metrics`;",
+              "    pm.expect(response).to.have.property('responseType').to.equal(expectedResponseType);",
+              "    pm.expect(response).to.have.property('pspId');",
               "    pm.expect(response).to.have.property('kpiName');",
               "    pm.expect(response).to.have.property('kpiDescription');",
               "    pm.expect(response).to.have.property('kpiDescriptionUrl');",
@@ -29,7 +32,7 @@
         "method": "GET",
         "header": [
           {
-            "key": "ocp-apim-subscription-key",
+            "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
           },
@@ -40,11 +43,11 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE}}?pspId={{PSP_ID}}&period={{PERIOD_MONTHLY}}&date={{DATE}}",
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_LFDR}}?pspId={{PSP_ID}}&period={{PERIOD_MONTH}}&date={{DATE_MONTH}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "fdr-kpi",
-            "{{KPI_TYPE}}"
+            "{{KPI_TYPE_LFDR}}"
           ],
           "query": [
             {
@@ -53,11 +56,202 @@
             },
             {
               "key": "period",
-              "value": "{{PERIOD_MONTHLY}}"
+              "value": "{{PERIOD_MONTH}}"
             },
             {
               "key": "date",
-              "value": "{{DATE}}"
+              "value": "{{DATE_MONTH}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "QI FdR Calculate Monthly WPNFDR KPI - Success (BROKER)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Calculate Monthly WPNFDR KPI - Success Response\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    const period = pm.request.url.query.find(q => q.key === 'period').value;",
+              "    const kpiType = pm.request.url.path[1];",
+              "    const expectedResponseType = `${period === 'monthly' ? 'Monthly' : 'Daily'}${kpiType}Metrics`;",
+              "    pm.expect(response).to.have.property('responseType').to.equal(expectedResponseType);",
+              "    pm.expect(response).to.have.property('brokerId');",
+              "    pm.expect(response).to.have.property('kpiName');",
+              "    pm.expect(response).to.have.property('kpiDescription');",
+              "    pm.expect(response).to.have.property('kpiDescriptionUrl');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Ocp-Apim-Subscription-Key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_WPNFDR}}?brokerId={{BROKER_ID}}&period={{PERIOD_MONTH}}&date={{DATE_MONTH}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "fdr-kpi",
+            "{{KPI_TYPE_WPNFDR}}"
+          ],
+          "query": [
+            {
+              "key": "brokerId",
+              "value": "{{BROKER_ID}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_MONTH}}"
+            },
+            {
+              "key": "date",
+              "value": "{{DATE_MONTH}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "QI FdR Calculate Daily NRFDR KPI - Success (BROKER)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Calculate Daily NRFDR KPI - Success Response\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    const period = pm.request.url.query.find(q => q.key === 'period').value;",
+              "    const kpiType = pm.request.url.path[1];",
+              "    const expectedResponseType = `${period === 'monthly' ? 'Monthly' : 'Daily'}${kpiType}Metrics`;",
+              "    pm.expect(response).to.have.property('responseType').to.equal(expectedResponseType);",
+              "    pm.expect(response).to.have.property('brokerId');",
+              "    pm.expect(response).to.have.property('kpiName');",
+              "    pm.expect(response).to.have.property('kpiDescription');",
+              "    pm.expect(response).to.have.property('kpiDescriptionUrl');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Ocp-Apim-Subscription-Key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_NRFDR}}?brokerId={{BROKER_ID}}&period={{PERIOD_DAY}}&date={{DATE_DAY}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "fdr-kpi",
+            "{{KPI_TYPE_NRFDR}}"
+          ],
+          "query": [
+            {
+              "key": "brokerId",
+              "value": "{{BROKER_ID}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_DAY}}"
+            },
+            {
+              "key": "date",
+              "value": "{{DATE_DAY}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "QI FdR Calculate Daily WAFDR KPI - Success (BROKER + PSP)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Calculate Daily WAFDR KPI - Success Response\", function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    const period = pm.request.url.query.find(q => q.key === 'period').value;",
+              "    const kpiType = pm.request.url.path[1];",
+              "    const expectedResponseType = `${period === 'monthly' ? 'Monthly' : 'Daily'}${kpiType}Metrics`;",
+              "    pm.expect(response).to.have.property('responseType').to.equal(expectedResponseType);",
+              "    pm.expect(response).to.have.property('brokerId');",
+              "    pm.expect(response).to.have.property('pspId');",
+              "    pm.expect(response).to.have.property('kpiName');",
+              "    pm.expect(response).to.have.property('kpiDescription');",
+              "    pm.expect(response).to.have.property('kpiDescriptionUrl');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Ocp-Apim-Subscription-Key",
+            "value": "{{API_SUBSCRIPTION_KEY}}",
+            "type": "text"
+          },
+          {
+            "key": "deployment",
+            "value": "{{DEPLOYMENT}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_WAFDR}}?brokerId={{BROKER_ID}}&pspId={{PSP_ID}}&period={{PERIOD_DAY}}&date={{DATE_DAY}}",
+          "host": ["{{HOSTNAME}}"],
+          "path": [
+            "fdr-kpi",
+            "{{KPI_TYPE_WAFDR}}"
+          ],
+          "query": [
+            {
+              "key": "brokerId",
+              "value": "{{BROKER_ID}}"
+            },
+            {
+              "key": "pspId",
+              "value": "{{PSP_ID}}"
+            },
+            {
+              "key": "period",
+              "value": "{{PERIOD_DAY}}"
+            },
+            {
+              "key": "date",
+              "value": "{{DATE_DAY}}"
             }
           ]
         }
@@ -86,7 +280,7 @@
         "method": "GET",
         "header": [
           {
-            "key": "ocp-apim-subscription-key",
+            "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
           },
@@ -97,11 +291,11 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE}}?pspId={{PSP_ID_NOT_FOUND}}&period={{PERIOD_MONTHLY}}&date={{DATE}}",
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_LFDR}}?pspId={{PSP_ID_NOT_FOUND}}&period={{PERIOD_MONTH}}&date={{DATE_MONTH}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "fdr-kpi",
-            "{{KPI_TYPE}}"
+            "{{KPI_TYPE_LFDR}}"
           ],
           "query": [
             {
@@ -110,11 +304,11 @@
             },
             {
               "key": "period",
-              "value": "{{PERIOD_MONTHLY}}"
+              "value": "{{PERIOD_MONTH}}"
             },
             {
               "key": "date",
-              "value": "{{DATE}}"
+              "value": "{{DATE_MONTH}}"
             }
           ]
         }
@@ -142,7 +336,7 @@
         "method": "GET",
         "header": [
           {
-            "key": "ocp-apim-subscription-key",
+            "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
           },
@@ -153,7 +347,7 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_NOT_VALID}}?pspId={{PSP_ID}}&period={{PERIOD_MONTHLY}}&date={{DATE}}",
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_NOT_VALID}}?pspId={{PSP_ID}}&period={{PERIOD_MONTH}}&date={{DATE_MONTH}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "fdr-kpi",
@@ -166,11 +360,11 @@
             },
             {
               "key": "period",
-              "value": "{{PERIOD_MONTHLY}}"
+              "value": "{{PERIOD_MONTH}}"
             },
             {
               "key": "date",
-              "value": "{{DATE}}"
+              "value": "{{DATE_MONTH}}"
             }
           ]
         }
@@ -198,7 +392,7 @@
         "method": "GET",
         "header": [
           {
-            "key": "ocp-apim-subscription-key",
+            "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
           },
@@ -209,11 +403,11 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE}}?pspId={{PSP_ID}}&period={{PERIOD_NOT_VALID}}&date={{DATE}}",
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_LFDR}}?pspId={{PSP_ID}}&period={{PERIOD_NOT_VALID}}&date={{DATE_MONTH}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "fdr-kpi",
-            "{{KPI_TYPE}}"
+            "{{KPI_TYPE_LFDR}}"
           ],
           "query": [
             {
@@ -226,7 +420,7 @@
             },
             {
               "key": "date",
-              "value": "{{DATE}}"
+              "value": "{{DATE_MONTH}}"
             }
           ]
         }
@@ -256,7 +450,7 @@
         "method": "GET",
         "header": [
           {
-            "key": "ocp-apim-subscription-key",
+            "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
           },
@@ -267,11 +461,11 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE}}?pspId={{PSP_ID}}&period={{PERIOD_DAILY}}&date={{DATE_TOO_RECENT}}",
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_LFDR}}?pspId={{PSP_ID}}&period={{PERIOD_DAY}}&date={{DATE_TOO_RECENT}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "fdr-kpi",
-            "{{KPI_TYPE}}"
+            "{{KPI_TYPE_LFDR}}"
           ],
           "query": [
             {
@@ -280,7 +474,7 @@
             },
             {
               "key": "period",
-              "value": "{{PERIOD_DAILY}}"
+              "value": "{{PERIOD_DAY}}"
             },
             {
               "key": "date",
@@ -312,7 +506,7 @@
         "method": "GET",
         "header": [
           {
-            "key": "ocp-apim-subscription-key",
+            "key": "Ocp-Apim-Subscription-Key",
             "value": "{{API_SUBSCRIPTION_KEY}}",
             "type": "text"
           },
@@ -323,11 +517,11 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE}}?pspId={{PSP_ID}}&period={{PERIOD_MONTHLY}}&date={{DATE_NOT_VALID}}",
+          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_LFDR}}?pspId={{PSP_ID}}&period={{PERIOD_MONTH}}&date={{DATE_NOT_VALID}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "fdr-kpi",
-            "{{KPI_TYPE}}"
+            "{{KPI_TYPE_LFDR}}"
           ],
           "query": [
             {
@@ -336,7 +530,7 @@
             },
             {
               "key": "period",
-              "value": "{{PERIOD_MONTHLY}}"
+              "value": "{{PERIOD_MONTH}}"
             },
             {
               "key": "date",
