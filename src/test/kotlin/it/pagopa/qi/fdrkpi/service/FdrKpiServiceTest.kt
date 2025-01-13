@@ -7,7 +7,10 @@ import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseAllOfDto.EntityTy
 import it.pagopa.generated.qi.fdrkpi.v1.model.KPIEntityResponseAllOfDto.KpiNameEnum
 import it.pagopa.generated.qi.fdrkpi.v1.model.KPIResponseDto
 import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.LFDR_QUERY
+import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.NRFDR_QUERY
 import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.TOTAL_FLOWS_QUERY
+import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.WAFDR_QUERY
+import it.pagopa.qi.fdrkpi.dataprovider.kusto.v1.KustoQueries.WPNFDR_QUERY
 import it.pagopa.qi.fdrkpi.exceptionhandler.*
 import it.pagopa.qi.fdrkpi.utils.*
 import java.time.LocalDate
@@ -35,16 +38,18 @@ class FdrKpiServiceTest {
             OffsetDateTime.of(2023, 10, 1, 0, 0, 0, 0, ZoneOffset.UTC)
 
         @JvmStatic
-        private fun successfullyQueriesProvider(): Stream<Arguments> =
-            Stream.of(
+        private fun successfullyQueriesProvider(): Stream<Arguments> {
+            val pspID = "SARDIT31"
+
+            return Stream.of(
                 // LFDR - daily
                 Arguments.of(
                     LFDR_QUERY,
                     KpiNameEnum.LFDR,
                     FdrKpiPeriod.daily,
                     10,
-                    listOf(2, 3),
-                    dailyPspLfdrBuilder(date, 10, 2, 3, EntityTypeEnum.PSP)
+                    listOf(20, 30),
+                    dailyLfdrBuilder(date, 10, 2, 3, EntityTypeEnum.PSP, null, pspID)
                 ),
                 // LFDR - monthly
                 Arguments.of(
@@ -53,9 +58,138 @@ class FdrKpiServiceTest {
                     FdrKpiPeriod.monthly,
                     0,
                     listOf(2, 3),
-                    monthlyLfdrBuilder("2", "3", EntityTypeEnum.PSP)
+                    monthlyLfdrBuilder("2", "3", EntityTypeEnum.PSP, null, pspID)
                 )
             )
+        }
+
+        @JvmStatic
+        private fun kpiQueriesProvider(): Stream<Arguments> {
+            val pspID = "SARDIT31"
+
+            return Stream.of(
+                // LFDR - daily
+                Arguments.of(
+                    KpiNameEnum.LFDR,
+                    LFDR_QUERY,
+                    FdrKpiPeriod.daily,
+                    10,
+                    listOf(20, 30),
+                    dailyLfdrBuilder(
+                        paymentDate = OffsetDateTime.of(2023, 10, 1, 0, 0, 0, 0, ZoneOffset.UTC),
+                        totalReports = 10,
+                        lateFdrV1 = 2,
+                        lateFdrV2 = 3,
+                        entityType = EntityTypeEnum.PSP,
+                        brokerId = null,
+                        pspId = pspID
+                    )
+                ),
+                // WAFDR - daily
+                Arguments.of(
+                    KpiNameEnum.WAFDR,
+                    WAFDR_QUERY,
+                    FdrKpiPeriod.daily,
+                    10,
+                    listOf(30),
+                    dailyWafdrBuilder(
+                        paymentDate = OffsetDateTime.of(2023, 10, 1, 0, 0, 0, 0, ZoneOffset.UTC),
+                        totalReports = 10,
+                        totalDiffNum = 3,
+                        entityType = EntityTypeEnum.PSP,
+                        brokerId = null,
+                        pspId = pspID
+                    )
+                ),
+                // WAFDR - monthly
+                Arguments.of(
+                    KpiNameEnum.WAFDR,
+                    WAFDR_QUERY,
+                    FdrKpiPeriod.monthly,
+                    0,
+                    listOf(3),
+                    monthlyWafdrBuilder("3", EntityTypeEnum.PSP, null, pspID)
+                ),
+                // NRFDR - daily
+                Arguments.of(
+                    KpiNameEnum.NRFDR,
+                    NRFDR_QUERY,
+                    FdrKpiPeriod.daily,
+                    10,
+                    listOf(20),
+                    dailyNrfdrBuilder(
+                        paymentDate = OffsetDateTime.of(2023, 10, 1, 0, 0, 0, 0, ZoneOffset.UTC),
+                        totalReports = 10,
+                        missingReports = 2,
+                        foundReports = 8,
+                        entityType = EntityTypeEnum.PSP,
+                        brokerId = null,
+                        pspId = pspID
+                    )
+                ),
+                // NRFDR - monthly
+                Arguments.of(
+                    KpiNameEnum.NRFDR,
+                    NRFDR_QUERY,
+                    FdrKpiPeriod.monthly,
+                    0,
+                    listOf(2),
+                    monthlyNrfdrBuilder("2", EntityTypeEnum.PSP, null, pspID)
+                ),
+                // WPNFDR - daily
+                Arguments.of(
+                    KpiNameEnum.WPNFDR,
+                    WPNFDR_QUERY,
+                    FdrKpiPeriod.daily,
+                    10,
+                    listOf(40),
+                    dailyWpnfdrBuilder(
+                        paymentDate = OffsetDateTime.of(2023, 10, 1, 0, 0, 0, 0, ZoneOffset.UTC),
+                        totalReports = 10,
+                        totalDiffNum = 4,
+                        entityType = EntityTypeEnum.PSP,
+                        brokerId = null,
+                        pspId = pspID
+                    )
+                ),
+                // WPNFDR - monthly
+                Arguments.of(
+                    KpiNameEnum.WPNFDR,
+                    WPNFDR_QUERY,
+                    FdrKpiPeriod.monthly,
+                    0,
+                    listOf(4),
+                    monthlyWpnfdrBuilder("4", EntityTypeEnum.PSP, null, pspID)
+                )
+            )
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("kpiQueriesProvider")
+    fun `Should return correct responses for different KPI types`(
+        kpiType: KpiNameEnum,
+        queryString: String,
+        fdrKpiPeriod: FdrKpiPeriod,
+        totalReports: Int,
+        queryResponse: List<Any>,
+        expectedResponse: KPIResponseDto
+    ) {
+        val dateString = if (fdrKpiPeriod == FdrKpiPeriod.daily) "2023-10-01" else "2023-10"
+        val dateRange = getDateRange(fdrKpiPeriod, dateString)
+        val pspId = "SARDIT31"
+        val brokerId: String? = null
+
+        if (fdrKpiPeriod == FdrKpiPeriod.daily) {
+            mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, pspId, brokerId, listOf(totalReports))
+        }
+
+        mockKustoResponse(queryString, dateRange, pspId, brokerId, queryResponse)
+
+        val response =
+            fdrKpiService.calculateKpi(kpiType.name, fdrKpiPeriod.name, dateString, brokerId, pspId)
+
+        assertEquals(expectedResponse, response)
     }
 
     @ParameterizedTest
@@ -72,13 +206,14 @@ class FdrKpiServiceTest {
         val dateRange = getDateRange(fdrKpiPeriod, dateString)
 
         if (fdrKpiPeriod == FdrKpiPeriod.daily) {
-            mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, pspID, listOf(totalReports))
+            mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, pspID, null, listOf(totalReports))
         }
 
-        mockKustoResponse(queryString, dateRange, pspID, queryResponse)
+        mockKustoResponse(queryString, dateRange, pspID, null, queryResponse)
 
         val response =
             fdrKpiService.calculateKpi(kpiNameEnum.name, fdrKpiPeriod.name, dateString, null, pspID)
+
         assertEquals(expectedResponse, response)
     }
 
@@ -149,9 +284,9 @@ class FdrKpiServiceTest {
         val dateString = "2023-10"
         val dateRange = getDateRange(FdrKpiPeriod.monthly, dateString)
 
-        mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, "ABCDEFGH", listOf(10))
+        mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, "ABCDEFGH", null, listOf(10))
 
-        mockKustoResponse(LFDR_QUERY, dateRange, "ABCDEFGH", listOf(-1, -1))
+        mockKustoResponse(LFDR_QUERY, dateRange, "ABCDEFGH", null, listOf(-1, -1))
 
         val ex =
             assertThrows<PspNotFoundException> {
@@ -171,7 +306,7 @@ class FdrKpiServiceTest {
         val dateString = "2023-10-01"
         val dateRange = getDateRange(FdrKpiPeriod.daily, dateString)
 
-        mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, pspID, listOf(10))
+        mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, pspID, null, listOf(10))
 
         val query = prepareQuery(LFDR_QUERY, dateRange.first, dateRange.second, null, pspID)
 
@@ -192,27 +327,28 @@ class FdrKpiServiceTest {
     }
 
     @Test
-    fun `Should throw RuntimeException for brokerFiscalCode and pspId null on prepareQuery`() {
+    fun `Should throw RuntimeException for brokerId and pspId null on prepareQuery`() {
         val dateRange = Pair(LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-01"))
         val ex =
             assertThrows<RuntimeException> {
                 prepareQuery(LFDR_QUERY, dateRange.first, dateRange.second)
             }
-        assertEquals("BrokerFiscalCode and PspId are not defined", ex.message)
+        assertEquals("BrokerId and PspId are not defined", ex.message)
     }
 
     private fun mockKustoResponse(
         queryString: String,
         dateRange: Pair<LocalDate, LocalDate>,
         pspId: String?,
+        brokerId: String?,
         responseRow: List<Any>
     ) {
         val preparedQuery =
-            prepareQuery(queryString, dateRange.first, dateRange.second, null, pspId)
+            prepareQuery(queryString, dateRange.first, dateRange.second, brokerId, pspId)
         val operationResult = mock(KustoOperationResult::class.java)
         val resultSet = mock(KustoResultSetTable::class.java)
 
-        given(resultSet.next()).willReturn(true)
+        given(resultSet.next()).willReturn(true, false)
         given(resultSet.currentRow).willReturn(responseRow)
         given(operationResult.primaryResults).willReturn(resultSet)
         given(reKustoClient.executeQuery("re", preparedQuery)).willReturn(operationResult)
