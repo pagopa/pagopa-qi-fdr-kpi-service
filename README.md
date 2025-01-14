@@ -85,12 +85,13 @@ to get a good default configuration.
 If you want to customize the application environment, reference this table:
 
 
-| Variable name                                | Description                                                              | type         | default |
-|---------------------------------------------|--------------------------------------------------------------------------|--------------|---------|
-| AZURE_DATA_EXPLORER_RE_ENDPOINT              | Azure Data Explorer endpoint URL for the resource                        | URL (string) |         |
-| AZURE_DATA_EXPLORER_RE_CLIENT_ID             | Client ID for Azure Data Explorer authentication                         | string       |         |
-| AZURE_DATA_EXPLORER_RE_APPLICATION_KEY       | Application key/secret for Azure Data Explorer authentication            | string       |         |
-| AZURE_DATA_EXPLORER_RE_APPLICATION_TENANT_ID | Azure tenant ID for Azure Data Explorer authentication                   | string       |         |
+| Variable name                                | Description                                                   | type         | default      |
+|----------------------------------------------|---------------------------------------------------------------|--------------|--------------|
+| AZURE_DATA_EXPLORER_RE_ENDPOINT              | Azure Data Explorer endpoint URL for the resource             | URL (string) |              |
+| AZURE_DATA_EXPLORER_RE_CLIENT_ID             | Client ID for Azure Data Explorer authentication              | string       |              |
+| AZURE_DATA_EXPLORER_RE_APPLICATION_KEY       | Application key/secret for Azure Data Explorer authentication | string       |              |
+| AZURE_DATA_EXPLORER_RE_APPLICATION_TENANT_ID | Azure tenant ID for Azure Data Explorer authentication        | string       |              |
+| AZURE_DATA_EXPLORER_RE_DATABASE              | Azure Data Explorer database name                             | string       | NetDefaultDB |
 
 ### Run docker container
 
