@@ -66,10 +66,22 @@ stages:
     jobs:
         - job: make_integration_test
           steps:
-            - script: docker compose up -d
-              displayName: 'Run app with docker-compose'
             - script: |
-                timeout 180 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/actuator/health/liveness)" != "200" ]]; do sleep 5; done' || exit 1
+                docker compose up -d
+                echo "Waiting for services to be ready..."
+                docker compose ps
+                docker compose logs --follow --tail=100
+              displayName: 'Run app with docker-compose and show logs'
+            - script: |
+                timeout 180 bash -c '
+                while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:8080/actuator/health/liveness)" != "200" ]]; do 
+                  echo "Waiting for liveness check..."
+                  docker compose logs --tail=50
+                  sleep 5
+                done
+                echo "Checking readiness..."
+                curl -v localhost:8080/actuator/health/readiness
+                ' || exit 1
               displayName: 'Health check pagopa-qi-fdr-kpi-service'
             - script: yarn global add newman
               displayName: 'newman installation'
@@ -77,7 +89,9 @@ stages:
                 TODAY=$(date '+%Y-%m-%d')
                 sed -i "s/\"DATE_TOO_RECENT\": \".*\"/\"DATE_TOO_RECENT\": \"$TODAY\"/" api-tests/env/fdrkpi_local.env.json
               displayName: 'Update DATE_TOO_RECENT in environment file'
-            - script: newman run api-tests/v1/qi-fdrkpi.api.tests.local.json --environment=api-tests/env/fdrkpi_local.env.json --reporters cli,junit --reporter-junit-export Results/fdrkpi-api-TEST.xml
+            - script: |
+                sleep 15
+                newman run api-tests/v1/qi-fdrkpi.api.tests.local.json --environment=api-tests/env/fdrkpi_local.env.json --reporters cli,junit --reporter-junit-export Results/fdrkpi-api-TEST.xml
               displayName: 'Run FdR KPI API test'
               continueOnError: false
             - task: PublishTestResults@2
