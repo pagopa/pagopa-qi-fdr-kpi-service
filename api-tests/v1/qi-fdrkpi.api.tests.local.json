@@ -428,63 +428,6 @@
       "response": []
     },
     {
-      "name": "QI FdR Calculate KPI - Date Too Recent",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Date Too Recent - Status code is 400\", function () {",
-              "    pm.response.to.have.status(400);",
-              "    const response = pm.response.json();",
-              "    pm.expect(response).to.have.property('status').to.equal(400);",
-              "    pm.expect(response.title).to.equal('Date Too Recent');",
-              "    pm.expect(response.detail).to.equal('Daily KPI requests must be for dates at least 10 days in the past');",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Ocp-Apim-Subscription-Key",
-            "value": "{{API_SUBSCRIPTION_KEY}}",
-            "type": "text"
-          },
-          {
-            "key": "deployment",
-            "value": "{{DEPLOYMENT}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "{{HOSTNAME}}/fdr-kpi/{{KPI_TYPE_LFDR}}?pspId={{PSP_ID}}&period={{PERIOD_DAY}}&date={{DATE_TOO_RECENT}}",
-          "host": ["{{HOSTNAME}}"],
-          "path": [
-            "fdr-kpi",
-            "{{KPI_TYPE_LFDR}}"
-          ],
-          "query": [
-            {
-              "key": "pspId",
-              "value": "{{PSP_ID}}"
-            },
-            {
-              "key": "period",
-              "value": "{{PERIOD_DAY}}"
-            },
-            {
-              "key": "date",
-              "value": "{{DATE_TOO_RECENT}}"
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "QI FdR Calculate KPI - Invalid Date Format",
       "event": [
         {

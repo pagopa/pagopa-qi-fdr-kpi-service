@@ -6,9 +6,6 @@ services:
       context: .
     env_file:
       - docker-local/qi-fdr-kpi/qi-fdr-kpi.env
-    environment:
-      LOGGING_LEVEL_ROOT: DEBUG
-      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK: DEBUG
     ports:
       - "8080:8080"
     networks:
