@@ -70,7 +70,7 @@ stages:
                 docker compose up -d
                 echo "Waiting for services to be ready..."
                 docker compose ps
-                docker compose logs --follow --tail=100
+                docker compose logs --tail=100
               displayName: 'Run app with docker-compose and show logs'
             - script: |
                 timeout 180 bash -c '
