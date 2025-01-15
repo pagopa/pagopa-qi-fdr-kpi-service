@@ -1,5 +1,4 @@
 services:
-
   qi-fdr-kpi:
     container_name: pagopa-qi-fdr-kpi-service
     build:
@@ -11,6 +10,15 @@ services:
       - "8080:8080"
     networks:
       - pagopa-qi-fdr-kpi-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health/liveness"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      localhost-data-explorer:
+        condition: service_healthy
+
   localhost-data-explorer:
     container_name: localhost-data-explorer
     build:
@@ -20,6 +28,11 @@ services:
       - "8083:8080"
     networks:
       - pagopa-qi-fdr-kpi-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   pagopa-qi-fdr-kpi-net:
