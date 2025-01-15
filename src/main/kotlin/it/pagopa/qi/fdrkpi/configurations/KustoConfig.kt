@@ -3,6 +3,8 @@ package it.pagopa.qi.fdrkpi.configurations
 import com.microsoft.azure.kusto.data.Client
 import com.microsoft.azure.kusto.data.ClientFactory
 import com.microsoft.azure.kusto.data.auth.ConnectionStringBuilder
+import com.microsoft.azure.kusto.data.auth.endpoints.KustoTrustedEndpoints
+import com.microsoft.azure.kusto.data.auth.endpoints.MatchRule
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -22,6 +24,16 @@ class KustoConfig {
             "Creating Kusto client for endpoint [{}] with tenant ID [{}]",
             endpoint,
             tenantId
+        )
+
+        /*
+           Adds a new trusted host for local development only.
+           The host set in the envs that matches it should start with the substring "http://localhost",
+           to avoid authorization/token checks
+        */
+        KustoTrustedEndpoints.addTrustedHosts(
+            listOf(MatchRule("localhost-data-explorer", true)),
+            false
         )
 
         val connectionStringBuilder =
