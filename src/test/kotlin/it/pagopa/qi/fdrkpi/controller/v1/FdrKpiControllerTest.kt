@@ -45,8 +45,8 @@ class FdrKpiControllerTest {
 
     @ParameterizedTest
     @MethodSource("requesterInfoProvider")
-    fun `Should correctly format requester info for different combinations of brokerId and pspId`(
-        brokerId: String?,
+    fun `Should correctly format requester info for different combinations of brokerFiscalCode and pspId`(
+        brokerFiscalCode: String?,
         pspId: String?
     ) {
         val kpiResponse =
@@ -56,14 +56,15 @@ class FdrKpiControllerTest {
                 lateFdrV1 = 1,
                 lateFdrV2 = 2,
                 entityType = EntityTypeEnum.PSP,
-                brokerId = brokerId,
+                brokerFiscalCode = brokerFiscalCode,
                 pspId = pspId
             )
 
-        given(fdrKpiService.calculateKpi("LFDR", "daily", "2023-10-01", brokerId, pspId))
+        given(fdrKpiService.calculateKpi("LFDR", "daily", "2023-10-01", brokerFiscalCode, pspId))
             .willReturn(kpiResponse)
 
-        val response = fdrKpiController.calculateKpi("LFDR", "daily", "2023-10-01", brokerId, pspId)
+        val response =
+            fdrKpiController.calculateKpi("LFDR", "daily", "2023-10-01", brokerFiscalCode, pspId)
 
         assertEquals(ResponseEntity.ok(kpiResponse), response)
     }

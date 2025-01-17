@@ -14,13 +14,13 @@ fun prepareQuery(
     query: String,
     startDate: LocalDate,
     endDate: LocalDate,
-    brokerId: String? = null,
+    brokerFiscalCode: String? = null,
     pspId: String? = null
 ): String {
     return query
         .replace("\$START_DATE", startDate.toString())
         .replace("\$END_DATE", endDate.toString())
-        .replace("\$FILTER", generateIdFilter(brokerId, pspId))
+        .replace("\$FILTER", generateIdFilter(brokerFiscalCode, pspId))
 }
 
 fun getDateRange(period: FdrKpiPeriod, date: String): Pair<LocalDate, LocalDate> {
