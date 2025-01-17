@@ -35,7 +35,7 @@ class FdrKpiService(
         kpiType: String,
         period: String,
         date: String,
-        brokerId: String?,
+        brokerFiscalCode: String?,
         pspId: String?
     ): KPIResponseDto {
         validateInputs(kpiType, period, date)
@@ -43,19 +43,20 @@ class FdrKpiService(
         val dateRange = getDateRange(FdrKpiPeriod.valueOf(period), date)
         val totalReports =
             if (FdrKpiPeriod.daily == FdrKpiPeriod.valueOf(period)) {
-                executeQuery(KustoQueries.TOTAL_FLOWS_QUERY, dateRange, brokerId, pspId)
+                executeQuery(KustoQueries.TOTAL_FLOWS_QUERY, dateRange, brokerFiscalCode, pspId)
                     .firstOrNull() as? Int
                     ?: 0
             } else 0
 
         return when (KpiNameEnum.valueOf(kpiType)) {
-            KpiNameEnum.LFDR -> buildLfdrResponse(period, dateRange, totalReports, brokerId, pspId)
+            KpiNameEnum.LFDR ->
+                buildLfdrResponse(period, dateRange, totalReports, brokerFiscalCode, pspId)
             KpiNameEnum.WAFDR ->
-                buildWafdrResponse(period, dateRange, totalReports, brokerId, pspId)
+                buildWafdrResponse(period, dateRange, totalReports, brokerFiscalCode, pspId)
             KpiNameEnum.NRFDR ->
-                buildNrfdrResponse(period, dateRange, totalReports, brokerId, pspId)
+                buildNrfdrResponse(period, dateRange, totalReports, brokerFiscalCode, pspId)
             KpiNameEnum.WPNFDR ->
-                buildWpnfdrResponse(period, dateRange, totalReports, brokerId, pspId)
+                buildWpnfdrResponse(period, dateRange, totalReports, brokerFiscalCode, pspId)
         }
     }
 
@@ -63,11 +64,11 @@ class FdrKpiService(
         period: String,
         dateRange: Pair<LocalDate, LocalDate>,
         totalReports: Int,
-        brokerId: String?,
+        brokerFiscalCode: String?,
         pspId: String?
     ): KPIResponseDto {
-        val result = executeQuery(LFDR_QUERY, dateRange, brokerId, pspId)
-        val entityType = if (brokerId != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
+        val result = executeQuery(LFDR_QUERY, dateRange, brokerFiscalCode, pspId)
+        val entityType = if (brokerFiscalCode != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
 
         return when (FdrKpiPeriod.valueOf(period)) {
             FdrKpiPeriod.daily -> {
@@ -99,7 +100,7 @@ class FdrKpiService(
                     lateReportsFirst,
                     lateReportsSecond,
                     entityType,
-                    brokerId,
+                    brokerFiscalCode,
                     pspId
                 )
             }
@@ -108,7 +109,7 @@ class FdrKpiService(
                     result[0].toString(),
                     result[1].toString(),
                     entityType,
-                    brokerId,
+                    brokerFiscalCode,
                     pspId
                 )
         }
@@ -118,11 +119,11 @@ class FdrKpiService(
         period: String,
         dateRange: Pair<LocalDate, LocalDate>,
         totalReports: Int,
-        brokerId: String?,
+        brokerFiscalCode: String?,
         pspId: String?
     ): KPIResponseDto {
-        val result = executeQuery(WAFDR_QUERY, dateRange, brokerId, pspId)
-        val entityType = if (brokerId != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
+        val result = executeQuery(WAFDR_QUERY, dateRange, brokerFiscalCode, pspId)
+        val entityType = if (brokerFiscalCode != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
 
         return when (FdrKpiPeriod.valueOf(period)) {
             FdrKpiPeriod.daily -> {
@@ -132,12 +133,12 @@ class FdrKpiService(
                     totalReports,
                     wrongAmountReports,
                     entityType,
-                    brokerId,
+                    brokerFiscalCode,
                     pspId
                 )
             }
             FdrKpiPeriod.monthly ->
-                monthlyWafdrBuilder(result[0].toString(), entityType, brokerId, pspId)
+                monthlyWafdrBuilder(result[0].toString(), entityType, brokerFiscalCode, pspId)
         }
     }
 
@@ -145,11 +146,11 @@ class FdrKpiService(
         period: String,
         dateRange: Pair<LocalDate, LocalDate>,
         totalReports: Int,
-        brokerId: String?,
+        brokerFiscalCode: String?,
         pspId: String?
     ): KPIResponseDto {
-        val result = executeQuery(NRFDR_QUERY, dateRange, brokerId, pspId)
-        val entityType = if (brokerId != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
+        val result = executeQuery(NRFDR_QUERY, dateRange, brokerFiscalCode, pspId)
+        val entityType = if (brokerFiscalCode != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
 
         return when (FdrKpiPeriod.valueOf(period)) {
             FdrKpiPeriod.daily -> {
@@ -160,12 +161,12 @@ class FdrKpiService(
                     missingReports,
                     totalReports - missingReports,
                     entityType,
-                    brokerId,
+                    brokerFiscalCode,
                     pspId
                 )
             }
             FdrKpiPeriod.monthly ->
-                monthlyNrfdrBuilder(result[0].toString(), entityType, brokerId, pspId)
+                monthlyNrfdrBuilder(result[0].toString(), entityType, brokerFiscalCode, pspId)
         }
     }
 
@@ -173,11 +174,11 @@ class FdrKpiService(
         period: String,
         dateRange: Pair<LocalDate, LocalDate>,
         totalReports: Int,
-        brokerId: String?,
+        brokerFiscalCode: String?,
         pspId: String?
     ): KPIResponseDto {
-        val result = executeQuery(WPNFDR_QUERY, dateRange, brokerId, pspId)
-        val entityType = if (brokerId != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
+        val result = executeQuery(WPNFDR_QUERY, dateRange, brokerFiscalCode, pspId)
+        val entityType = if (brokerFiscalCode != null) EntityTypeEnum.BROKER else EntityTypeEnum.PSP
 
         return when (FdrKpiPeriod.valueOf(period)) {
             FdrKpiPeriod.daily -> {
@@ -187,12 +188,12 @@ class FdrKpiService(
                     totalReports,
                     wrongPaymentNumReports,
                     entityType,
-                    brokerId,
+                    brokerFiscalCode,
                     pspId
                 )
             }
             FdrKpiPeriod.monthly ->
-                monthlyWpnfdrBuilder(result[0].toString(), entityType, brokerId, pspId)
+                monthlyWpnfdrBuilder(result[0].toString(), entityType, brokerFiscalCode, pspId)
         }
     }
 
@@ -205,10 +206,11 @@ class FdrKpiService(
     private fun executeQuery(
         query: String,
         dateRange: Pair<LocalDate, LocalDate>,
-        brokerId: String?,
+        brokerFiscalCode: String?,
         pspId: String?
     ): List<Any> {
-        val preparedQuery = prepareQuery(query, dateRange.first, dateRange.second, brokerId, pspId)
+        val preparedQuery =
+            prepareQuery(query, dateRange.first, dateRange.second, brokerFiscalCode, pspId)
         logger.debug("Executing query: $preparedQuery")
         return try {
             val result = reKustoClient.executeQuery(database, preparedQuery)

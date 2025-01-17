@@ -17,9 +17,9 @@ class QueryUtilsTest {
         val startDate = LocalDate.of(2024, 1, 1)
         val endDate = LocalDate.of(2024, 1, 31)
         val pspId = "PSP123"
-        val brokerId = "01234556789"
+        val brokerFiscalCode = "01234556789"
 
-        val result = prepareQuery(query, startDate, endDate, brokerId, pspId)
+        val result = prepareQuery(query, startDate, endDate, brokerFiscalCode, pspId)
 
         val expected =
             "SELECT * FROM table | where ID_PSP == \"PSP123\" and ID_BROKER_PSP == \"01234556789\" | where GIORNATA_PAGAMENTO between (datetime(2024-01-01) .. datetime(2024-01-31))"

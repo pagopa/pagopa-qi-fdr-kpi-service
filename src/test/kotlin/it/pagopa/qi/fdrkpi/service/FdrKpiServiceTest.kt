@@ -81,7 +81,7 @@ class FdrKpiServiceTest {
                         lateFdrV1 = 2,
                         lateFdrV2 = 3,
                         entityType = EntityTypeEnum.PSP,
-                        brokerId = null,
+                        brokerFiscalCode = null,
                         pspId = pspID
                     )
                 ),
@@ -97,7 +97,7 @@ class FdrKpiServiceTest {
                         totalReports = 10,
                         totalDiffNum = 3,
                         entityType = EntityTypeEnum.PSP,
-                        brokerId = null,
+                        brokerFiscalCode = null,
                         pspId = pspID
                     )
                 ),
@@ -123,7 +123,7 @@ class FdrKpiServiceTest {
                         missingReports = 2,
                         foundReports = 8,
                         entityType = EntityTypeEnum.PSP,
-                        brokerId = null,
+                        brokerFiscalCode = null,
                         pspId = pspID
                     )
                 ),
@@ -148,7 +148,7 @@ class FdrKpiServiceTest {
                         totalReports = 10,
                         totalDiffNum = 4,
                         entityType = EntityTypeEnum.PSP,
-                        brokerId = null,
+                        brokerFiscalCode = null,
                         pspId = pspID
                     )
                 ),
@@ -178,16 +178,28 @@ class FdrKpiServiceTest {
         val dateString = if (fdrKpiPeriod == FdrKpiPeriod.daily) "2023-10-01" else "2023-10"
         val dateRange = getDateRange(fdrKpiPeriod, dateString)
         val pspId = "SARDIT31"
-        val brokerId: String? = null
+        val brokerFiscalCode: String? = null
 
         if (fdrKpiPeriod == FdrKpiPeriod.daily) {
-            mockKustoResponse(TOTAL_FLOWS_QUERY, dateRange, pspId, brokerId, listOf(totalReports))
+            mockKustoResponse(
+                TOTAL_FLOWS_QUERY,
+                dateRange,
+                pspId,
+                brokerFiscalCode,
+                listOf(totalReports)
+            )
         }
 
-        mockKustoResponse(queryString, dateRange, pspId, brokerId, queryResponse)
+        mockKustoResponse(queryString, dateRange, pspId, brokerFiscalCode, queryResponse)
 
         val response =
-            fdrKpiService.calculateKpi(kpiType.name, fdrKpiPeriod.name, dateString, brokerId, pspId)
+            fdrKpiService.calculateKpi(
+                kpiType.name,
+                fdrKpiPeriod.name,
+                dateString,
+                brokerFiscalCode,
+                pspId
+            )
 
         assertEquals(expectedResponse, response)
     }
@@ -327,24 +339,24 @@ class FdrKpiServiceTest {
     }
 
     @Test
-    fun `Should throw RuntimeException for brokerId and pspId null on prepareQuery`() {
+    fun `Should throw RuntimeException for brokerFiscalCode and pspId null on prepareQuery`() {
         val dateRange = Pair(LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-01"))
         val ex =
             assertThrows<RuntimeException> {
                 prepareQuery(LFDR_QUERY, dateRange.first, dateRange.second)
             }
-        assertEquals("BrokerId and PspId are not defined", ex.message)
+        assertEquals("BrokerFiscalCode and PspId are not defined", ex.message)
     }
 
     private fun mockKustoResponse(
         queryString: String,
         dateRange: Pair<LocalDate, LocalDate>,
         pspId: String?,
-        brokerId: String?,
+        brokerFiscalCode: String?,
         responseRow: List<Any>
     ) {
         val preparedQuery =
-            prepareQuery(queryString, dateRange.first, dateRange.second, brokerId, pspId)
+            prepareQuery(queryString, dateRange.first, dateRange.second, brokerFiscalCode, pspId)
         val operationResult = mock(KustoOperationResult::class.java)
         val resultSet = mock(KustoResultSetTable::class.java)
 

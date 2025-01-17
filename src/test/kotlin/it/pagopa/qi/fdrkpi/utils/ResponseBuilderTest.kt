@@ -14,12 +14,13 @@ class ResponseBuilderTest {
         URI(
             "https://developer.pagopa.it/pago-pa/guides/sanp/prestatore-di-servizi-di-pagamento/quality-improvement"
         )
-    private val brokerId = "01153230360"
+    private val brokerFiscalCode = "01153230360"
     private val pspId = "SARDIT31"
 
     @Test
     fun `Should return DailyLFDRMetricsDto`() {
-        val result = dailyLfdrBuilder(paymentDate, 1, 1, 1, EntityTypeEnum.PSP, brokerId, pspId)
+        val result =
+            dailyLfdrBuilder(paymentDate, 1, 1, 1, EntityTypeEnum.PSP, brokerFiscalCode, pspId)
         assertEquals(paymentDate, result.paymentDate)
         assertEquals(1, result.totalReports)
         assertEquals(1, result.lateFdrV1)
@@ -32,7 +33,7 @@ class ResponseBuilderTest {
     }
     @Test
     fun `Should return MonthlyLFDRMetricsDto`() {
-        val result = monthlyLfdrBuilder("90%", "80%", EntityTypeEnum.PSP, brokerId, pspId)
+        val result = monthlyLfdrBuilder("90%", "80%", EntityTypeEnum.PSP, brokerFiscalCode, pspId)
         assertEquals("monthly", result.responseType)
         assertEquals("90%", result.kpiLfdrV1Value)
         assertEquals("80%", result.kpiLfdrV2Value)
@@ -44,7 +45,8 @@ class ResponseBuilderTest {
 
     @Test
     fun `Should return DailyNRFDRMetricsDto`() {
-        val result = dailyNrfdrBuilder(paymentDate, 10, 3, 7, EntityTypeEnum.PSP, brokerId, pspId)
+        val result =
+            dailyNrfdrBuilder(paymentDate, 10, 3, 7, EntityTypeEnum.PSP, brokerFiscalCode, pspId)
         assertEquals(paymentDate, result.paymentDate)
         assertEquals(10, result.totalReports)
         assertEquals("daily", result.responseType)
@@ -58,7 +60,7 @@ class ResponseBuilderTest {
 
     @Test
     fun `Should return MonthlyNRFDRMetricsDto`() {
-        val result = monthlyNrfdrBuilder("85%", EntityTypeEnum.PSP, brokerId, pspId)
+        val result = monthlyNrfdrBuilder("85%", EntityTypeEnum.PSP, brokerFiscalCode, pspId)
         assertEquals("85%", result.kpiValue)
         assertEquals("monthly", result.responseType)
         assertEquals("FdR non rendicontati", result.kpiDescription)
@@ -69,7 +71,8 @@ class ResponseBuilderTest {
 
     @Test
     fun `Should return DailyWPNFDRMetricsDto`() {
-        val result = dailyWpnfdrBuilder(paymentDate, 15, 2, EntityTypeEnum.PSP, brokerId, pspId)
+        val result =
+            dailyWpnfdrBuilder(paymentDate, 15, 2, EntityTypeEnum.PSP, brokerFiscalCode, pspId)
         assertEquals(paymentDate, result.paymentDate)
         assertEquals(15, result.totalReports)
         assertEquals("daily", result.responseType)
@@ -82,7 +85,7 @@ class ResponseBuilderTest {
 
     @Test
     fun `Should return MonthlyWPNFDRMetricsDto`() {
-        val result = monthlyWpnfdrBuilder("70%", EntityTypeEnum.PSP, brokerId, pspId)
+        val result = monthlyWpnfdrBuilder("70%", EntityTypeEnum.PSP, brokerFiscalCode, pspId)
         assertEquals("70%", result.kpiValue)
         assertEquals("monthly", result.responseType)
         assertEquals("FdR con numero di pagamenti errato", result.kpiDescription)
@@ -93,7 +96,8 @@ class ResponseBuilderTest {
 
     @Test
     fun `Should return DailyWAFDRMetricsDto`() {
-        val result = dailyWafdrBuilder(paymentDate, 20, 5, EntityTypeEnum.PSP, brokerId, pspId)
+        val result =
+            dailyWafdrBuilder(paymentDate, 20, 5, EntityTypeEnum.PSP, brokerFiscalCode, pspId)
         assertEquals(paymentDate, result.paymentDate)
         assertEquals(20, result.totalReports)
         assertEquals("daily", result.responseType)
@@ -106,7 +110,7 @@ class ResponseBuilderTest {
 
     @Test
     fun `Should return MonthlyWAFDRMetricsDto`() {
-        val result = monthlyWafdrBuilder("65%", EntityTypeEnum.PSP, brokerId, pspId)
+        val result = monthlyWafdrBuilder("65%", EntityTypeEnum.PSP, brokerFiscalCode, pspId)
         assertEquals("65%", result.kpiValue)
         assertEquals("monthly", result.responseType)
         assertEquals("FdR con importo errato", result.kpiDescription)

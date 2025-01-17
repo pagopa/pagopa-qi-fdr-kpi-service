@@ -20,13 +20,13 @@ package it.pagopa.qi.fdrkpi.dataprovider.kusto.v1
  */
 object KustoQueries {
 
-    fun generateIdFilter(brokerId: String?, pspId: String?): String {
+    fun generateIdFilter(brokerFiscalCode: String?, pspId: String?): String {
         return when {
-            pspId != null && brokerId != null ->
-                "| where ID_PSP == \"$pspId\" and ID_BROKER_PSP == \"$brokerId\""
+            pspId != null && brokerFiscalCode != null ->
+                "| where ID_PSP == \"$pspId\" and ID_BROKER_PSP == \"$brokerFiscalCode\""
             pspId != null -> "| where ID_PSP == \"$pspId\""
-            brokerId != null -> "| where ID_BROKER_PSP == \"$brokerId\""
-            else -> throw RuntimeException("BrokerId and PspId are not defined")
+            brokerFiscalCode != null -> "| where ID_BROKER_PSP == \"$brokerFiscalCode\""
+            else -> throw RuntimeException("BrokerFiscalCode and PspId are not defined")
         }
     }
 

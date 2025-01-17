@@ -83,7 +83,7 @@
               "    const kpiType = pm.request.url.path[1];",
               "    const expectedResponseType = `${period === 'monthly' ? 'Monthly' : 'Daily'}${kpiType}Metrics`;",
               "    pm.expect(response).to.have.property('responseType').to.equal(expectedResponseType);",
-              "    pm.expect(response).to.have.property('brokerId');",
+              "    pm.expect(response).to.have.property('brokerFiscalCode');",
               "    pm.expect(response).to.have.property('kpiName');",
               "    pm.expect(response).to.have.property('kpiDescription');",
               "    pm.expect(response).to.have.property('kpiDescriptionUrl');",
@@ -108,7 +108,7 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE_WPNFDR}}?brokerId={{BROKER_ID}}&period={{PERIOD_MONTH}}&date={{DATE_MONTH}}",
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE_WPNFDR}}?brokerFiscalCode={{BROKER_FISCAL_CODE}}&period={{PERIOD_MONTH}}&date={{DATE_MONTH}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "qi",
@@ -119,8 +119,8 @@
           ],
           "query": [
             {
-              "key": "brokerId",
-              "value": "{{BROKER_ID}}"
+              "key": "brokerFiscalCode",
+              "value": "{{BROKER_FISCAL_CODE}}"
             },
             {
               "key": "period",
@@ -148,7 +148,7 @@
               "    const kpiType = pm.request.url.path[1];",
               "    const expectedResponseType = `${period === 'monthly' ? 'Monthly' : 'Daily'}${kpiType}Metrics`;",
               "    pm.expect(response).to.have.property('responseType').to.equal(expectedResponseType);",
-              "    pm.expect(response).to.have.property('brokerId');",
+              "    pm.expect(response).to.have.property('brokerFiscalCode');",
               "    pm.expect(response).to.have.property('kpiName');",
               "    pm.expect(response).to.have.property('kpiDescription');",
               "    pm.expect(response).to.have.property('kpiDescriptionUrl');",
@@ -173,7 +173,7 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE_NRFDR}}?brokerId={{BROKER_ID}}&period={{PERIOD_DAY}}&date={{DATE_DAY}}",
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE_NRFDR}}?brokerFiscalCode={{BROKER_FISCAL_CODE}}&period={{PERIOD_DAY}}&date={{DATE_DAY}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "qi",
@@ -184,8 +184,8 @@
           ],
           "query": [
             {
-              "key": "brokerId",
-              "value": "{{BROKER_ID}}"
+              "key": "brokerFiscalCode",
+              "value": "{{BROKER_FISCAL_CODE}}"
             },
             {
               "key": "period",
@@ -213,7 +213,7 @@
               "    const kpiType = pm.request.url.path[1];",
               "    const expectedResponseType = `${period === 'monthly' ? 'Monthly' : 'Daily'}${kpiType}Metrics`;",
               "    pm.expect(response).to.have.property('responseType').to.equal(expectedResponseType);",
-              "    pm.expect(response).to.have.property('brokerId');",
+              "    pm.expect(response).to.have.property('brokerFiscalCode');",
               "    pm.expect(response).to.have.property('pspId');",
               "    pm.expect(response).to.have.property('kpiName');",
               "    pm.expect(response).to.have.property('kpiDescription');",
@@ -239,7 +239,7 @@
           }
         ],
         "url": {
-          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE_WAFDR}}?brokerId={{BROKER_ID}}&pspId={{PSP_ID}}&period={{PERIOD_DAY}}&date={{DATE_DAY}}",
+          "raw": "{{HOSTNAME}}/qi/fdr-kpi-service/v1/fdr-kpi/{{KPI_TYPE_WAFDR}}?brokerFiscalCode={{BROKER_FISCAL_CODE}}&pspId={{PSP_ID}}&period={{PERIOD_DAY}}&date={{DATE_DAY}}",
           "host": ["{{HOSTNAME}}"],
           "path": [
             "qi",
@@ -250,8 +250,8 @@
           ],
           "query": [
             {
-              "key": "brokerId",
-              "value": "{{BROKER_ID}}"
+              "key": "brokerFiscalCode",
+              "value": "{{BROKER_FISCAL_CODE}}"
             },
             {
               "key": "pspId",

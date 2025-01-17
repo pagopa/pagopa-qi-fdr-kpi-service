@@ -19,7 +19,7 @@ class FdrKpiController(@Autowired private val fdrKpiService: FdrKpiService) : Fd
      * @param period The time period granularity (single day or calendar month) (required)
      * @param date For daily KPIs: Specify the full date (YYYY-MM-DD). Must be at least 10 days
      *   before current date. For monthly KPIs: Specify year and month (YYYY-MM). (required)
-     * @param brokerId The fiscal code of the broker
+     * @param brokerFiscalCode The fiscal code of the broker
      * @param pspId The fiscal code of the PSP
      * @return KPI calculated (status code 200) or Formally invalid input Possible error types: -
      *   DATE_TOO_RECENT: Daily KPI requests must be for dates at least 10 days in the past (status
@@ -30,13 +30,14 @@ class FdrKpiController(@Autowired private val fdrKpiService: FdrKpiService) : Fd
         kpiType: String,
         period: String,
         date: String,
-        brokerId: String?,
+        brokerFiscalCode: String?,
         pspId: String?
     ): ResponseEntity<KPIResponseDto> {
         val requesterInfo =
             when {
-                brokerId != null && pspId != null -> "Broker [$brokerId] (for PSP [$pspId])"
-                brokerId != null -> "Broker [$brokerId]"
+                brokerFiscalCode != null && pspId != null ->
+                    "Broker [$brokerFiscalCode] (for PSP [$pspId])"
+                brokerFiscalCode != null -> "Broker [$brokerFiscalCode]"
                 pspId != null -> "PSP [$pspId]"
                 else -> "Unknown requester"
             }
@@ -50,7 +51,8 @@ class FdrKpiController(@Autowired private val fdrKpiService: FdrKpiService) : Fd
         )
 
         try {
-            val response = fdrKpiService.calculateKpi(kpiType, period, date, brokerId, pspId)
+            val response =
+                fdrKpiService.calculateKpi(kpiType, period, date, brokerFiscalCode, pspId)
             logger.info(
                 "Successfully calculated [{}] [{}] KPI for {} for date [{}]",
                 period,
