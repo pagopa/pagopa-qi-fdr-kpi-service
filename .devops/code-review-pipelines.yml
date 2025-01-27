@@ -119,8 +119,8 @@ stages:
             echo "##vso[task.setvariable variable=shouldDeploy;isOutput=true]false"
           fi
         displayName: "Check Commit Messages 'TODEPLOY'"
-        outputs:
-            shouldDeploy: $[ dependencies.FilterCommits.outputs['shouldDeploy'] ]
+      outputs:
+          shouldDeploy: $[ dependencies.FilterCommits.outputs['shouldDeploy'] ]
     - job: Build_docker
       dependsOn: FilterCommits
       condition: eq(dependencies.FilterCommits.outputs['shouldDeploy'], 'true')
