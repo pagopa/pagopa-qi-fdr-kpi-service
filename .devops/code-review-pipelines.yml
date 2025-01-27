@@ -13,7 +13,7 @@ resources:
       name: pagopa/azure-pipeline-templates
       ref: refs/tags/v2.10.1
       endpoint: 'io-azure-devops-github-ro'
-      
+
 stages:
   - stage: BuildAndUnitTest
     jobs:
@@ -121,7 +121,7 @@ stages:
 
   - stage: 'Build_for_DEV'
     displayName: 'Build for DEV'
-    dependsOn: FilterCommits
+    dependsOn: CheckCommitAndDeploy
     condition: eq(dependencies.FilterCommits.outputs['shouldDeploy'], 'true')
     jobs:
       - job: Build_docker
