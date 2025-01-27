@@ -120,48 +120,42 @@ stages:
           fi
         displayName: "Check Commit Messages 'TODEPLOY'"
 
-  - stage: 'Build_for_DEV'
-    displayName: 'Build for DEV'
-    dependsOn: CheckCommitAndDeploy
-    condition: eq(dependencies.FilterCommits.outputs['shouldDeploy'], 'true')
-    jobs:
-      - job: Build_docker
-        displayName: Build docker with Build.SourceVersion as TAG
-        steps:
-          - template: templates/docker-release/template.yaml@pagopaCommons
-            parameters:
-              CONTAINER_REGISTRY_SERVICE_CONN: $(DEV_CONTAINER_REGISTRY_SERVICE_CONN)
-              CONTAINER_REGISTRY_FQDN: $(DEV_CONTAINER_NAMESPACE)
-              DOCKER_IMAGE_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
-              DOCKER_IMAGE_TAG: $(Build.SourceVersion)
-              FORCE_REPLACE_DOCKER_IMAGE: false
+    - job: Build_docker
+      dependsOn: CheckCommitAndDeploy
+      condition: eq(dependencies.FilterCommits.outputs['shouldDeploy'], 'true')
+      displayName: Build docker with Build.SourceVersion as TAG for DEV
+      steps:
+        - template: templates/docker-release/template.yaml@pagopaCommons
+          parameters:
+            CONTAINER_REGISTRY_SERVICE_CONN: $(DEV_CONTAINER_REGISTRY_SERVICE_CONN)
+            CONTAINER_REGISTRY_FQDN: $(DEV_CONTAINER_NAMESPACE)
+            DOCKER_IMAGE_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
+            DOCKER_IMAGE_TAG: $(Build.SourceVersion)
+            FORCE_REPLACE_DOCKER_IMAGE: false
   
-  - stage: 'Deploy_for_DEV'
-    displayName: 'Deploy DEV'
-    dependsOn: Build_for_DEV
-    jobs:
-      - deployment: "deploy"
-        environment: 'DEV'
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-                  displayName: "Checkout"
-                - task: Bash@3
-                  name: update_chart_version
-                  displayName: 'Setup helm microservice chart'
-                  inputs:
-                    targetType: "inline"
-                    script: |
-                      helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
-                      helm dep build helm
-                - template: azure-templates/helm-microservice-chart-deploy.yml
-                  parameters:
-                    DO_DEPLOY: true
-                    ENV: 'DEV'
-                    KUBERNETES_SERVICE_CONN: $(DEV_KUBERNETES_SERVICE_CONN)
-                    NAMESPACE: qi
-                    APP_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
-                    VALUE_FILE: "helm/values-dev.yaml"
-                    GREEN_VERSION: $(Build.SourceVersion)
+    - deployment: "deploy"
+      dependsOn: Build_docker
+      environment: 'DEV'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+                displayName: "Checkout"
+              - task: Bash@3
+                name: update_chart_version
+                displayName: 'Setup helm microservice chart'
+                inputs:
+                  targetType: "inline"
+                  script: |
+                    helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
+                    helm dep build helm
+              - template: azure-templates/helm-microservice-chart-deploy.yml
+                parameters:
+                  DO_DEPLOY: true
+                  ENV: 'DEV'
+                  KUBERNETES_SERVICE_CONN: $(DEV_KUBERNETES_SERVICE_CONN)
+                  NAMESPACE: qi
+                  APP_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
+                  VALUE_FILE: "helm/values-dev.yaml"
+                  GREEN_VERSION: $(Build.SourceVersion)
