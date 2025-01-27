@@ -121,7 +121,7 @@ stages:
         displayName: "Check Commit Messages 'TODEPLOY'"
 
     - job: Build_docker
-      dependsOn: CheckCommitAndDeploy
+      dependsOn: FilterCommits
       condition: eq(dependencies.FilterCommits.outputs['shouldDeploy'], 'true')
       displayName: Build docker with Build.SourceVersion as TAG for DEV
       steps:
