@@ -101,6 +101,7 @@ stages:
 
   - stage: CheckCommitAndDeploy
     displayName: "Check Commit Message and Deploy"
+    dependsOn: [ ]
     jobs:
     - job: FilterCommits
       displayName: "Filter Commits"
