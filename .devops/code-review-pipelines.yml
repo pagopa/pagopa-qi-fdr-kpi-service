@@ -118,7 +118,7 @@ stages:
             echo "No commit message with 'TODEPLOY' found. Skipping deploy."
             echo "##vso[task.setvariable variable=shouldDeploy]false"
           fi
-        displayName: "Check Commit Messages"
+        displayName: "Check Commit Messages 'TODEPLOY'"
 
   - stage: 'Build_for_DEV'
     displayName: 'Build for DEV'
