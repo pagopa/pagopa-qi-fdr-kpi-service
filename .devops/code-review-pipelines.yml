@@ -119,10 +119,11 @@ stages:
             echo "##vso[task.setvariable variable=shouldDeploy;isOutput=true]false"
           fi
         displayName: "Check Commit Messages 'TODEPLOY'"
-
+        outputs:
+            shouldDeploy: $[ dependencies.FilterCommits.outputs['shouldDeploy'] ]
     - job: Build_docker
       dependsOn: FilterCommits
-      condition: eq(stageDependencies.CheckCommitAndDeploy.FilterCommits.outputs['shouldDeploy'], 'true')
+      condition: eq(dependencies.FilterCommits.outputs['shouldDeploy'], 'true')
       displayName: Build docker with Build.SourceVersion as TAG for DEV
       steps:
         - template: templates/docker-release/template.yaml@pagopaCommons
