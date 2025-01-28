@@ -100,7 +100,7 @@ stages:
                 searchFolder: '$(System.DefaultWorkingDirectory)'
 
   - stage: CheckCommitAndDeploy
-    displayName: "Check Commit Message and Deploy"
+    displayName: "Deploy to DEV if the commit contains TODEPLOY"
     dependsOn: [ ]
     jobs:
     - job: FilterCommits
