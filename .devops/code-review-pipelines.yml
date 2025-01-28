@@ -126,7 +126,7 @@ stages:
 
     - job: Build_docker
       dependsOn: FilterCommits
-      condition: eq($(shouldDeploy.value), 'true')
+      condition: eq(variables[shouldDeploy.value], 'true')
       displayName: Build docker with Build.SourceVersion as TAG for DEV
       steps:
         - template: templates/docker-release/template.yaml@pagopaCommons
