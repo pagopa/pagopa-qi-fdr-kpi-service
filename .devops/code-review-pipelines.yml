@@ -104,7 +104,7 @@ stages:
     dependsOn: [ ]
     jobs:
     - job: FilterCommits
-      displayName: "Filter Commits"
+      displayName: "Filter Commits job"
       steps:
       - checkout: self
       - task: Bash@3
