@@ -126,6 +126,7 @@ stages:
     displayName: 'Build for DEV'
     dependsOn: CheckCommitAndDeploy
     condition: eq(stageDependencies.CheckCommitAndDeploy.FilterCommits.outputs['FilterCommitsScript.shouldDeploy'], 'true')
+    jobs:
     - job: Build_docker
       displayName: Build docker with Build.SourceVersion as TAG for DEV
       steps:
