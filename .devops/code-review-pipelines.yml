@@ -113,15 +113,20 @@ stages:
 
           if echo "$commits" | grep -q "TODEPLOY"; then
             echo "Commit message with 'TODEPLOY' found. Proceeding to deploy..."
-            echo "##vso[task.setvariable variable=shouldDeploy]true"
+            echo "##vso[task.setvariable variable=shouldDeploy;isOutput=true]true"
           else
             echo "No commit message with 'TODEPLOY' found. Skipping deploy."
-            echo "##vso[task.setvariable variable=shouldDeploy]false"
+            echo "##vso[task.setvariable variable=shouldDeploy;isOutput=true]false"
           fi
+        name: FilterCommitsScript
+ 
 
+# --- START Deploy DEV --- #
+  - stage: 'Build_and_deploy_for_DEV'
+    displayName: 'Build for DEV'
+    dependsOn: CheckCommitAndDeploy
+    condition: eq(stageDependencies.CheckCommitAndDeploy.FilterCommits.outputs['FilterCommitsScript.shouldDeploy'], 'true')
     - job: Build_docker
-      dependsOn: FilterCommits
-      condition: eq(variables['shouldDeploy'], 'true') 
       displayName: Build docker with Build.SourceVersion as TAG for DEV
       steps:
         - template: templates/docker-release/template.yaml@pagopaCommons
