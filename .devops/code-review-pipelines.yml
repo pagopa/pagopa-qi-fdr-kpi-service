@@ -113,7 +113,7 @@ stages:
           targetType: "inline"
           script: |
             echo "Checking for commit message with suffix 'TODEPLOY'..."
-            commit_message=$(git log -1 --pretty=%B)
+            commit_message=$(git log --pretty=%B HEAD^..HEAD)
             echo "$commit_message"
             if echo "$commit_message" | grep -q "TODEPLOY"; then
               echo "Commit message with 'TODEPLOY' found. Proceeding to deploy..."
