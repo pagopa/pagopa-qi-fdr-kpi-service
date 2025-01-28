@@ -114,7 +114,7 @@ stages:
           script: |
             echo "Checking for commit message with suffix 'TODEPLOY'..."
             commit_message=$(git log -1 --pretty=%B)
-
+            echo "$commit_message"
             if echo "$commit_message" | grep -q "TODEPLOY"; then
               echo "Commit message with 'TODEPLOY' found. Proceeding to deploy..."
               echo "##vso[task.setvariable variable=shouldDeploy;isOutput=true]true"
