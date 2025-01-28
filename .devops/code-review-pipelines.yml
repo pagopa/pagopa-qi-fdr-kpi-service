@@ -113,9 +113,9 @@ stages:
           targetType: "inline"
           script: |
             echo "Checking for commit message with suffix 'TODEPLOY'..."
-            commits=$(git log --pretty=%B HEAD^..HEAD)
+            commit_message=$(git log -1 --pretty=%B)
 
-            if echo "$commits" | grep -q "TODEPLOY"; then
+            if echo "$commit_message" | grep -q "TODEPLOY"; then
               echo "Commit message with 'TODEPLOY' found. Proceeding to deploy..."
               echo "##vso[task.setvariable variable=shouldDeploy;isOutput=true]true"
             else
