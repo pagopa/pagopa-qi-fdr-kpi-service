@@ -122,7 +122,7 @@ stages:
               echo "No commit message with 'TODEPLOY' found. Skipping deploy."
               echo "##vso[task.setvariable variable=shouldDeploy;isOutput=true]false"
             fi
-           failOnStderr: true
+          failOnStderr: true
 
     - job: Build_docker
       dependsOn: CheckCommitAndDeploy
