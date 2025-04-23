@@ -2,6 +2,19 @@ microservice-chart:
   namespace: "qi"
   nameOverride: ""
   fullnameOverride: "pagopa-qi-fdr-kpi-service"
+  canaryDelivery:
+    create: false
+    ingress:
+      bluegreen: false
+      #set canary deployment with traffic balancing see https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md#canary for more info
+      header: true
+      headerName: deployment
+      headerValue: blue
+      weightPercent: 10
+    image:
+      repository: pagopadcommonacr.azurecr.io/pagopaqifdrkpiservice
+      tag: "latest"
+    envConfig: {}
   image:
     repository: pagopadcommonacr.azurecr.io/pagopaqifdrkpiservice
     tag: "1.1.1"
@@ -35,7 +48,7 @@ microservice-chart:
   serviceAccount:
     create: false
     annotations: {}
-    name: ""
+    name: "qi-workload-identity"
   podAnnotations: {}
   podSecurityContext:
     seccompProfile:
@@ -95,7 +108,5 @@ microservice-chart:
                 operator: In
                 values:
                   - user
-  canaryDelivery:
-    deployment:
-      image:
-        tag: ""
+  azure:
+    workloadIdentityClientId: "cf9b8103-75d1-4275-ae93-24a2c745625d"
