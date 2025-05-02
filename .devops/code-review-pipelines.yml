@@ -6,6 +6,14 @@ trigger: none
 pool:
   vmImage: ubuntu-latest
 
+resources:
+  repositories:
+    - repository: pagopaCommons
+      type: github
+      name: pagopa/azure-pipeline-templates
+      ref: refs/tags/v2.10.1
+      endpoint: 'io-azure-devops-github-ro'
+
 stages:
   - stage: BuildAndUnitTest
     jobs:
@@ -90,3 +98,68 @@ stages:
                 testResultsFormat: 'JUnit'
                 testResultsFiles: '**/*-TEST.xml'
                 searchFolder: '$(System.DefaultWorkingDirectory)'
+
+  - stage: CheckCommitAndDeploy
+    displayName: "Deploy to DEV if the commit contains TODEPLOY"
+    dependsOn: [ ]
+    jobs:
+    - job: FilterCommits
+      displayName: "Filter Commits job"
+      steps:
+      - checkout: self
+      - task: Bash@3
+        name: FilterCommitsScript
+        inputs:
+          targetType: "inline"
+          script: |
+            echo "Checking for commit message with suffix 'TODEPLOY'..."
+            commit_message=$(git log --pretty=%B HEAD^..HEAD)
+            echo "$commit_message"
+            if echo "$commit_message" | grep -q "TODEPLOY"; then
+              echo "Commit message with 'TODEPLOY' found. Proceeding to deploy..."
+              echo "##vso[task.setvariable variable=shouldDeploy;isOutput=true]true"
+            else
+              echo "No commit message with 'TODEPLOY' found. Skipping deploy."
+              echo "##vso[task.setvariable variable=shouldDeploy;isOutput=true]false"
+            fi
+          failOnStderr: true
+
+    - job: Build_docker
+      dependsOn: FilterCommits
+      condition: and(succeeded(), eq(dependencies.FilterCommits.outputs['FilterCommitsScript.shouldDeploy'], 'true'))
+      displayName: Build docker with Build.SourceVersion as TAG for DEV
+      steps:
+        - template: templates/docker-release/template.yaml@pagopaCommons
+          parameters:
+            CONTAINER_REGISTRY_SERVICE_CONN: $(DEV_CONTAINER_REGISTRY_SERVICE_CONN)
+            CONTAINER_REGISTRY_FQDN: $(DEV_CONTAINER_NAMESPACE)
+            DOCKER_IMAGE_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
+            DOCKER_IMAGE_TAG: $(Build.SourceVersion)
+            FORCE_REPLACE_DOCKER_IMAGE: false
+  
+    - deployment: "deploy"
+      dependsOn: Build_docker
+      environment: 'DEV'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - checkout: self
+                displayName: "Checkout"
+              - task: Bash@3
+                name: update_chart_version
+                displayName: 'Setup helm microservice chart'
+                inputs:
+                  targetType: "inline"
+                  script: |
+                    helm repo add microservice-chart https://pagopa.github.io/aks-microservice-chart-blueprint
+                    helm dep build helm
+              - template: azure-templates/helm-microservice-chart-deploy.yml
+                parameters:
+                  DO_DEPLOY: true
+                  ENV: 'DEV'
+                  KUBERNETES_SERVICE_CONN: $(DEV_KUBERNETES_SERVICE_CONN)
+                  NAMESPACE: qi
+                  APP_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
+                  VALUE_FILE: "helm/values-dev.yaml"
+                  GREEN_VERSION: $(Build.SourceVersion)
