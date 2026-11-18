@@ -14,7 +14,7 @@ microservice-chart:
     image:
       repository: pagopapcommonacr.azurecr.io/pagopaqifdrkpiservice
       tag: "latest"
-    envConfig: {}
+    envConfig: {JAVA_OPTS: "-XX:-UseBASE64Intrinsics"}
   image:
     repository: pagopapcommonacr.azurecr.io/pagopaqifdrkpiservice
     tag: "1.2.0"
@@ -83,7 +83,7 @@ microservice-chart:
           scaleUp:
             stabilizationWindowSeconds: 60
   envConfig:
-    JAVA_TOOL_OPTIONS: "-XX:-UseBASE64Intrinsics"
+    JAVA_OPTS: "-XX:-UseBASE64Intrinsics"
     DEFAULT_LOGGING_LEVEL: "info"
     APP_LOGGING_LEVEL: "info"
     WEB_LOGGING_LEVEL: "info"
